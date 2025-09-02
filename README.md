@@ -218,6 +218,6 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 **⭐ Se este projeto te ajudou, considere dar uma estrela!**
 
-*Desenvolvido com 💜 e muita ☕*
+*Desenvolvido para fins educacionais e com o foco de evoluir na prática como programador.*
 
 </div>
