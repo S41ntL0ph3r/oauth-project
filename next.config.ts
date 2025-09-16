@@ -10,6 +10,9 @@ const nextConfig: NextConfig = {
         pathname: '/u/**',
       },
     ],
+    // Configurações para imagens locais
+    unoptimized: process.env.NODE_ENV === 'development',
+    domains: ['localhost'],
   },
 };
 
