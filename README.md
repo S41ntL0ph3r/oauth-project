@@ -1,4 +1,4 @@
-# 🏦 Sistema de Gerenciamento Financeiro Pessoal
+# 🔐 Sistema de Autenticação Moderno com Next.js
 
 <div align="center">
 
@@ -7,10 +7,11 @@
 ![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)
 ![NextAuth](https://img.shields.io/badge/NextAuth-v5-purple?style=for-the-badge)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
+![EmailJS](https://img.shields.io/badge/EmailJS-Service-orange?style=for-the-badge)
 
-*Uma solução completa e moderna para controle de finanças pessoais*
+*Uma plataforma completa de autenticação com recuperação de senha e verificação de email*
 
-[Demo](#-demonstração) • [Recursos](#-recursos) • [Instalação](#-instalação) • [Tecnologias](#-tecnologias) • [Contribuição](#-contribuição)
+[Recursos](#-recursos-principais) • [Instalação](#-instalação) • [Tecnologias](#-tecnologias) • [Contribuição](#-contribuição)
 
 </div>
 
@@ -18,45 +19,42 @@
 
 ## 🎯 **Sobre o Projeto**
 
-Este projeto nasceu da necessidade de ter um **controle financeiro intuitivo e poderoso**, desenvolvido com as tecnologias mais modernas do mercado. Mais do que apenas um gerenciador de gastos, é uma **experiência completa** que transforma a forma como você administra suas finanças pessoais.
+Este é um **sistema de autenticação robusto e moderno**, construído com as melhores práticas de segurança e experiência do usuário. O projeto oferece uma base sólida para aplicações que precisam de autenticação segura, recuperação de senha e gerenciamento de perfil de usuário.
 
-### ✨ **Por que este projeto?**
-- 🎨 **Interface moderna** e responsiva com modo escuro/claro
-- 🔐 **Segurança em primeiro lugar** com autenticação robusta  
-- 📊 **Inteligência financeira** com cálculos automáticos em tempo real
-- 🚀 **Performance otimizada** com Next.js 15 e App Router
-- 💡 **Experiência do usuário** pensada em cada detalhe
+### ✨ **Diferenciais do Sistema**
+- 🔐 **Autenticação Híbrida** - OAuth (GitHub) + Credenciais locais
+- 📧 **Sistema de Email Completo** - Verificação e recuperação via EmailJS
+- �️ **Segurança Avançada** - Hash bcrypt, tokens seguros, sessões JWT
+- 🎨 **Interface Moderna** - Design responsivo com modo escuro/claro
+- ⚡ **Performance Otimizada** - Next.js 15 App Router com TypeScript
 
 ---
 
 ## 🌟 **Recursos Principais**
 
-### 💰 **Dashboard Inteligente**
-- 📈 **Saldo em tempo real** com cálculos automáticos
-- 📋 **Feed de atividades** para rastrear todas as operações
-- 🎯 **Visão consolidada** de receitas, despesas e pagamentos
+### � **Sistema de Autenticação Completo**
+- � **Login OAuth com GitHub** - Integração nativa e segura
+- � **Registro com credenciais** - Email e senha com validação
+- ✅ **Verificação de email obrigatória** - Links seguros via EmailJS
+- � **Sessões JWT persistentes** - NextAuth v5 com Prisma
 
-### 💳 **Gestão de Transações**
-- ➕ **Adicionar receitas/despesas** com categorização
-- 🏷️ **Sistema de categorias** para organização
-- 📅 **Controle por data** para análise temporal
+### 🛡️ **Recuperação de Senha Segura**
+- � **Envio automático de emails** - Sistema EmailJS integrado
+- � **Tokens únicos temporários** - Expiração automática em 24h
+- � **Hash seguro de senhas** - bcrypt com 12 rounds
+- ✨ **Interface intuitiva** - Formulários responsivos e acessíveis
 
-### ⏰ **Agendamento de Pagamentos**
-- 📅 **Agendar pagamentos** futuros
-- 🔄 **Controle de status** (Pendente/Pago/Vencido)
-- ⚠️ **Detecção automática** de pagamentos vencidos
-- ✏️ **Edição completa** de pagamentos agendados
+### � **Gerenciamento de Perfil**
+- �️ **Upload de avatar** - Imagens locais com redimensionamento
+- ✏️ **Edição de dados pessoais** - Nome, email e informações
+- � **Alteração de senha** - Modal seguro com validação
+- 🗑️ **Reset de avatar** - Voltar ao avatar padrão
 
-### 🔐 **Autenticação Segura**
-- 🐙 **Login com GitHub** via OAuth
-- 📧 **Credenciais locais** com verificação de email
-- 🛡️ **Sessões JWT** seguras com NextAuth v5
-- ✅ **Verificação de email** obrigatória
-
-### 🎨 **Experiência Visual**
-- 🌙 **Modo escuro/claro** com persistência
-- 📱 **Design responsivo** para todos os dispositivos
-- ⚡ **Transições suaves** e micro-interações
+### 🎨 **Experiência do Usuário**
+- 🌙 **Modo escuro/claro** - Preferência salva localmente
+- 📱 **Design totalmente responsivo** - Mobile-first
+- ⚡ **Cache inteligente** - Service Worker para performance
+- 🔔 **Feedbacks visuais** - Estados de carregamento e sucesso
 - 🎯 **Interface intuitiva** e acessível
 
 ---
