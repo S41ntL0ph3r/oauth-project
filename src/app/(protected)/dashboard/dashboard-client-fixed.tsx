@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import useLocalStorage from '@/hooks/useLocalStorage';
 
@@ -31,7 +31,7 @@ interface Activity {
   timestamp: string;
 }
 
-type ActiveTab = 'overview' | 'transactions' | 'payments' | 'activities' | 'settings';
+type ActiveTab = 'overview' | 'transactions' | 'payments' | 'activities';
 
 const DashboardClient: React.FC = () => {
   const { data: session } = useSession();
@@ -44,30 +44,11 @@ const DashboardClient: React.FC = () => {
   // Estado da aba ativa
   const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
   
-  // Estado para evitar hydration mismatch
-  const [isClient, setIsClient] = useState(false);
-  
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-  
   // Estados dos modais
   const [showAddTransaction, setShowAddTransaction] = useState(false);
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [showEditPayment, setShowEditPayment] = useState(false);
   const [editingPayment, setEditingPayment] = useState<Payment | null>(null);
-  
-  // Estados dos modais de confirmação de limpeza
-  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
-  const [showDeleteTransactionsConfirm, setShowDeleteTransactionsConfirm] = useState(false);
-  const [showDeletePaymentsConfirm, setShowDeletePaymentsConfirm] = useState(false);
-  const [showDeleteActivitiesConfirm, setShowDeleteActivitiesConfirm] = useState(false);
-  
-  // Estados dos modais de confirmação individual
-  const [showDeleteTransactionConfirm, setShowDeleteTransactionConfirm] = useState(false);
-  const [showDeletePaymentConfirm, setShowDeletePaymentConfirm] = useState(false);
-  const [transactionToDelete, setTransactionToDelete] = useState<Transaction | null>(null);
-  const [paymentToDelete, setPaymentToDelete] = useState<Payment | null>(null);
   
   // Estados dos formulários
   const [transactionForm, setTransactionForm] = useState({
@@ -175,112 +156,22 @@ const DashboardClient: React.FC = () => {
   const handleSaveEditPayment = useCallback(() => {
     if (!editingPayment) return;
 
-    // Obter o pagamento original para comparar status
-    const originalPayment = payments.find(p => p.id === editingPayment.id);
-    const wasNotCompleted = originalPayment && originalPayment.status !== 'completed';
-    const isNowCompleted = editingPayment.status === 'completed';
-
-    // Se o pagamento foi marcado como pago (de pendente/vencido para completed)
-    if (wasNotCompleted && isNowCompleted) {
-      // Criar uma transação de despesa correspondente
-      const expenseTransaction: Transaction = {
-        id: generateUniqueId(),
-        description: `Pagamento: ${editingPayment.description}`,
-        amount: -Math.abs(editingPayment.amount), // Garantir que seja negativo (despesa)
-        type: 'expense',
-        category: 'Pagamentos',
-        date: new Date().toISOString().split('T')[0]
-      };
-
-      // Adicionar a transação de despesa
-      setTransactions(prev => [expenseTransaction, ...prev]);
-
-      // Adicionar atividade específica para o pagamento realizado
-      const paymentActivity: Activity = {
-        id: generateUniqueId(),
-        description: `Pagamento realizado: ${editingPayment.description} - R$ ${editingPayment.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-        type: 'payment',
-        timestamp: new Date().toISOString()
-      };
-
-      setActivities(prev => [paymentActivity, ...prev]);
-    }
-
-    // Atualizar o pagamento
     setPayments(prev => prev.map(payment => 
       payment.id === editingPayment.id ? editingPayment : payment
     ));
 
-    // Adicionar atividade geral de atualização
-    const updateActivity: Activity = {
+    const newActivity: Activity = {
       id: generateUniqueId(),
-      description: `Status do pagamento atualizado: ${editingPayment.description} - ${
-        editingPayment.status === 'completed' ? 'Pago' : 
-        editingPayment.status === 'overdue' ? 'Vencido' : 'Pendente'
-      }`,
+      description: `Pagamento atualizado: ${editingPayment.description}`,
       type: 'payment',
       timestamp: new Date().toISOString()
     };
 
-    setActivities(prev => [updateActivity, ...prev]);
+    setActivities(prev => [newActivity, ...prev]);
 
     setShowEditPayment(false);
     setEditingPayment(null);
-  }, [editingPayment, payments, setPayments, setTransactions, setActivities, generateUniqueId]);
-  
-  // Função para deletar transação individual
-  const handleDeleteTransactionRequest = useCallback((transaction: Transaction) => {
-    setTransactionToDelete(transaction);
-    setShowDeleteTransactionConfirm(true);
-  }, []);
-
-  const handleConfirmDeleteTransaction = useCallback(() => {
-    if (!transactionToDelete) return;
-
-    // Remover a transação
-    setTransactions(prev => prev.filter(t => t.id !== transactionToDelete.id));
-    
-    // Adicionar atividade de exclusão
-    const deleteActivity: Activity = {
-      id: generateUniqueId(),
-      description: `Transação excluída: ${transactionToDelete.description} - ${transactionToDelete.type === 'income' ? '+' : '-'}R$ ${Math.abs(transactionToDelete.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      type: 'transaction',
-      timestamp: new Date().toISOString()
-    };
-
-    setActivities(prev => [deleteActivity, ...prev]);
-    
-    // Limpar estado
-    setTransactionToDelete(null);
-    setShowDeleteTransactionConfirm(false);
-  }, [transactionToDelete, setTransactions, setActivities, generateUniqueId]);
-
-  // Função para deletar pagamento individual
-  const handleDeletePaymentRequest = useCallback((payment: Payment) => {
-    setPaymentToDelete(payment);
-    setShowDeletePaymentConfirm(true);
-  }, []);
-
-  const handleConfirmDeletePayment = useCallback(() => {
-    if (!paymentToDelete) return;
-
-    // Remover o pagamento
-    setPayments(prev => prev.filter(p => p.id !== paymentToDelete.id));
-    
-    // Adicionar atividade de exclusão
-    const deleteActivity: Activity = {
-      id: generateUniqueId(),
-      description: `Pagamento excluído: ${paymentToDelete.description} - R$ ${paymentToDelete.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-      type: 'payment',
-      timestamp: new Date().toISOString()
-    };
-
-    setActivities(prev => [deleteActivity, ...prev]);
-    
-    // Limpar estado
-    setPaymentToDelete(null);
-    setShowDeletePaymentConfirm(false);
-  }, [paymentToDelete, setPayments, setActivities, generateUniqueId]);
+  }, [editingPayment, setPayments, setActivities, generateUniqueId]);
   
   // Função para renderizar o conteúdo ativo
   const renderActiveTab = () => {
@@ -293,8 +184,6 @@ const DashboardClient: React.FC = () => {
         return renderPaymentsTab();
       case 'activities':
         return renderActivitiesTab();
-      case 'settings':
-        return renderSettingsTab();
       default:
         return renderOverviewTab();
     }
@@ -521,26 +410,15 @@ const DashboardClient: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="text-right">
-                      <p className={`text-lg font-semibold ${
-                        transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {transaction.type === 'income' ? '+' : '-'}R$ {Math.abs(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                      </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {transaction.type === 'income' ? 'Receita' : 'Despesa'}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleDeleteTransactionRequest(transaction)}
-                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 ml-2 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                      title="Excluir transação"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                  <div className="text-right">
+                    <p className={`text-lg font-semibold ${
+                      transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {transaction.type === 'income' ? '+' : '-'}R$ {Math.abs(transaction.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -637,21 +515,9 @@ const DashboardClient: React.FC = () => {
                         setEditingPayment(payment);
                         setShowEditPayment(true);
                       }}
-                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 p-2 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                      title="Editar pagamento"
+                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDeletePaymentRequest(payment)}
-                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                      title="Excluir pagamento"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
+                      Editar
                     </button>
                   </div>
                 </div>
@@ -717,273 +583,13 @@ const DashboardClient: React.FC = () => {
     </div>
   );
 
-  // Componente da aba Configurações
-  const renderSettingsTab = () => {
-    const handleDeleteAll = () => {
-      setTransactions([]);
-      setPayments([]);
-      setActivities([]);
-      setShowDeleteAllConfirm(false);
-    };
-
-    const handleDeleteTransactions = () => {
-      setTransactions([]);
-      // Remover atividades relacionadas a transações
-      setActivities(prev => prev.filter(activity => activity.type !== 'transaction'));
-      setShowDeleteTransactionsConfirm(false);
-    };
-
-    const handleDeletePayments = () => {
-      setPayments([]);
-      // Remover atividades relacionadas a pagamentos
-      setActivities(prev => prev.filter(activity => activity.type !== 'payment'));
-      setShowDeletePaymentsConfirm(false);
-    };
-
-    const handleDeleteActivities = () => {
-      setActivities([]);
-      setShowDeleteActivitiesConfirm(false);
-    };
-
-    return (
-      <div className="space-y-6">
-        <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-          <div className="mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">⚙️ Configurações do Sistema</h2>
-            <p className="text-gray-600 dark:text-gray-300 mt-2">
-              Gerencie e limpe seus dados financeiros com cuidado. Estas ações não podem ser desfeitas.
-            </p>
-          </div>
-
-          {/* Estatísticas */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-              <p className="text-sm text-blue-600 dark:text-blue-400">Total de Transações</p>
-              <p className="text-2xl font-semibold text-blue-700 dark:text-blue-300">{transactions.length}</p>
-            </div>
-            <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-              <p className="text-sm text-purple-600 dark:text-purple-400">Total de Pagamentos</p>
-              <p className="text-2xl font-semibold text-purple-700 dark:text-purple-300">{payments.length}</p>
-            </div>
-            <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-              <p className="text-sm text-green-600 dark:text-green-400">Total de Atividades</p>
-              <p className="text-2xl font-semibold text-green-700 dark:text-green-300">{activities.length}</p>
-            </div>
-          </div>
-
-          {/* Ações de Limpeza */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">🗑️ Limpeza de Dados</h3>
-            
-            {/* Limpar Transações */}
-            <div className="border border-orange-200 dark:border-orange-800 rounded-lg p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-900 dark:text-white">Limpar Transações</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                    Remove todas as transações de receitas e despesas ({transactions.length} items)
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowDeleteTransactionsConfirm(true)}
-                  disabled={transactions.length === 0}
-                  className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                >
-                  Limpar Transações
-                </button>
-              </div>
-            </div>
-
-            {/* Limpar Pagamentos */}
-            <div className="border border-orange-200 dark:border-orange-800 rounded-lg p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-900 dark:text-white">Limpar Pagamentos</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                    Remove todos os pagamentos agendados e realizados ({payments.length} items)
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowDeletePaymentsConfirm(true)}
-                  disabled={payments.length === 0}
-                  className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                >
-                  Limpar Pagamentos
-                </button>
-              </div>
-            </div>
-
-            {/* Limpar Atividades */}
-            <div className="border border-orange-200 dark:border-orange-800 rounded-lg p-4">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-900 dark:text-white">Limpar Histórico de Atividades</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                    Remove todo o histórico de atividades ({activities.length} items)
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowDeleteActivitiesConfirm(true)}
-                  disabled={activities.length === 0}
-                  className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                >
-                  Limpar Histórico
-                </button>
-              </div>
-            </div>
-
-            {/* Limpar Tudo */}
-            <div className="border border-red-200 dark:border-red-800 rounded-lg p-4 bg-red-50 dark:bg-red-900/10">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h4 className="font-medium text-red-900 dark:text-red-200">⚠️ Limpar Todos os Dados</h4>
-                  <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                    Remove TODOS os dados financeiros: transações, pagamentos e histórico de atividades
-                  </p>
-                  <p className="text-xs text-red-600 dark:text-red-400 mt-2 font-medium">
-                    Esta ação é irreversível e apagará completamente seu histórico financeiro!
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowDeleteAllConfirm(true)}
-                  disabled={transactions.length === 0 && payments.length === 0 && activities.length === 0}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                >
-                  🗑️ Limpar Tudo
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Modais de Confirmação */}
-          {/* Modal Confirmar Limpar Tudo */}
-          {showDeleteAllConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
-                <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-4">⚠️ Confirmar Limpeza Total</h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-6">
-                  Tem certeza que deseja apagar <strong>TODOS</strong> os seus dados financeiros? 
-                  Esta ação não pode ser desfeita e você perderá:
-                </p>
-                <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 mb-6 space-y-1">
-                  <li>{transactions.length} transações</li>
-                  <li>{payments.length} pagamentos</li>
-                  <li>{activities.length} atividades</li>
-                </ul>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={handleDeleteAll}
-                    className="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
-                  >
-                    Sim, apagar tudo
-                  </button>
-                  <button
-                    onClick={() => setShowDeleteAllConfirm(false)}
-                    className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Modal Confirmar Limpar Transações */}
-          {showDeleteTransactionsConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
-                <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-200 mb-4">Confirmar Limpeza de Transações</h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  Tem certeza que deseja apagar todas as {transactions.length} transações? 
-                  Esta ação não pode ser desfeita.
-                </p>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={handleDeleteTransactions}
-                    className="flex-1 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition-colors"
-                  >
-                    Sim, apagar
-                  </button>
-                  <button
-                    onClick={() => setShowDeleteTransactionsConfirm(false)}
-                    className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Modal Confirmar Limpar Pagamentos */}
-          {showDeletePaymentsConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
-                <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-200 mb-4">Confirmar Limpeza de Pagamentos</h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  Tem certeza que deseja apagar todos os {payments.length} pagamentos? 
-                  Esta ação não pode ser desfeita.
-                </p>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={handleDeletePayments}
-                    className="flex-1 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition-colors"
-                  >
-                    Sim, apagar
-                  </button>
-                  <button
-                    onClick={() => setShowDeletePaymentsConfirm(false)}
-                    className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Modal Confirmar Limpar Atividades */}
-          {showDeleteActivitiesConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
-                <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-200 mb-4">Confirmar Limpeza do Histórico</h3>
-                <p className="text-gray-700 dark:text-gray-300 mb-4">
-                  Tem certeza que deseja apagar todas as {activities.length} atividades do histórico? 
-                  Esta ação não pode ser desfeita.
-                </p>
-                <div className="flex space-x-3">
-                  <button
-                    onClick={handleDeleteActivities}
-                    className="flex-1 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700 transition-colors"
-                  >
-                    Sim, apagar
-                  </button>
-                  <button
-                    onClick={() => setShowDeleteActivitiesConfirm(false)}
-                    className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Dashboard Financeiro</h1>
         <p className="text-gray-600 dark:text-gray-300">
-          {isClient && session ? 
-            `Bem-vindo, ${session.user?.name || session.user?.email}! Gerencie suas finanças aqui.` :
-            'Bem-vindo! Gerencie suas finanças aqui.'
-          }
+          Bem-vindo, {session?.user?.name || session?.user?.email}! Gerencie suas finanças aqui.
         </p>
       </div>
 
@@ -1029,16 +635,6 @@ const DashboardClient: React.FC = () => {
             }`}
           >
             Atividades
-          </button>
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'settings'
-                ? 'border-red-500 text-red-600 dark:text-red-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            ⚙️ Configurações
           </button>
         </div>
       </div>
@@ -1246,95 +842,6 @@ const DashboardClient: React.FC = () => {
                   setEditingPayment(null);
                 }}
                 className="flex-1 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Confirmar Exclusão de Transação */}
-      {showDeleteTransactionConfirm && transactionToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-4">⚠️ Confirmar Exclusão</h3>
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Tem certeza que deseja excluir esta transação?
-            </p>
-            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
-              <p className="font-medium text-gray-900 dark:text-white">{transactionToDelete.description}</p>
-              <p className={`text-sm ${transactionToDelete.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                {transactionToDelete.type === 'income' ? '+' : '-'}R$ {Math.abs(transactionToDelete.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {transactionToDelete.category} • {new Date(transactionToDelete.date).toLocaleDateString('pt-BR')}
-              </p>
-            </div>
-            <p className="text-sm text-red-600 dark:text-red-400 mb-4">
-              Esta ação não pode ser desfeita.
-            </p>
-            <div className="flex space-x-3">
-              <button
-                onClick={handleConfirmDeleteTransaction}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
-              >
-                Sim, excluir
-              </button>
-              <button
-                onClick={() => {
-                  setShowDeleteTransactionConfirm(false);
-                  setTransactionToDelete(null);
-                }}
-                className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Confirmar Exclusão de Pagamento */}
-      {showDeletePaymentConfirm && paymentToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-red-900 dark:text-red-200 mb-4">⚠️ Confirmar Exclusão</h3>
-            <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Tem certeza que deseja excluir este pagamento?
-            </p>
-            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg mb-4">
-              <p className="font-medium text-gray-900 dark:text-white">{paymentToDelete.description}</p>
-              <p className="text-sm text-gray-900 dark:text-white">
-                R$ {paymentToDelete.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-              </p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                <span className={`px-2 py-1 rounded-full text-xs ${
-                  paymentToDelete.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
-                  paymentToDelete.status === 'overdue' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' :
-                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-                }`}>
-                  {paymentToDelete.status === 'completed' ? 'Pago' : paymentToDelete.status === 'overdue' ? 'Vencido' : 'Pendente'}
-                </span>
-                • Vencimento: {new Date(paymentToDelete.dueDate).toLocaleDateString('pt-BR')}
-              </p>
-            </div>
-            <p className="text-sm text-red-600 dark:text-red-400 mb-4">
-              Esta ação não pode ser desfeita.
-            </p>
-            <div className="flex space-x-3">
-              <button
-                onClick={handleConfirmDeletePayment}
-                className="flex-1 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors"
-              >
-                Sim, excluir
-              </button>
-              <button
-                onClick={() => {
-                  setShowDeletePaymentConfirm(false);
-                  setPaymentToDelete(null);
-                }}
-                className="flex-1 bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors"
               >
                 Cancelar
               </button>

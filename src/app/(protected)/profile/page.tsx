@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import ProfileClient from "./profile-client";
+import ProfileClient from "./profile-client-new";
 
 const ProfilePage = async () => {
   const session = await auth();

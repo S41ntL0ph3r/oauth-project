@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useUser } from "@/contexts/user-context";
+import AvatarUpload from "@/components/ui/avatar-upload";
 
 interface ProfileClientProps {
   session: {
@@ -17,13 +17,20 @@ interface ProfileClientProps {
 
 const ProfileClient = ({ session: initialSession }: ProfileClientProps) => {
   const { data: session } = useSession();
-  const { userData } = useUser();
+  const { userData, refreshUser } = useUser();
   const currentSession = session || initialSession;
   
-  // Usar dados atualizados do banco quando disponíveis, mas manter imagem do GitHub
+  // Usar dados atualizados do banco quando disponíveis
+  // Priorizar imagem do banco, senão usar do GitHub
   const displayData = {
     ...userData,
-    image: currentSession?.user?.image // Sempre usar imagem do GitHub
+    image: userData?.image || currentSession?.user?.image // Priorizar imagem custom
+  };
+
+  // Callback para quando o upload for bem-sucedido
+  const handleUploadSuccess = async () => {
+    // Atualizar contexto do usuário
+    await refreshUser();
   };
 
   return (
@@ -33,30 +40,21 @@ const ProfileClient = ({ session: initialSession }: ProfileClientProps) => {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Perfil do Usuário</h1>
           
           {/* Foto do Perfil */}
-          <div className="flex items-center space-x-6 mb-8">
+          <div className="flex items-center space-x-8 mb-8">
             <div className="shrink-0">
-              {displayData?.image ? (
-                <Image 
-                  className="h-32 w-32 object-cover rounded-full shadow-lg" 
-                  src={displayData.image} 
-                  alt="Foto do perfil"
-                  width={128}
-                  height={128}
-                />
-              ) : (
-                <div className="h-32 w-32 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center shadow-lg">
-                  <svg className="h-16 w-16 text-gray-400 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-              )}
+              <AvatarUpload 
+                currentImage={userData?.image}
+                fallbackImage={currentSession?.user?.image}
+                onUploadSuccess={handleUploadSuccess}
+                size={200}
+              />
             </div>
             <div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Foto do GitHub
+                Foto do Perfil
               </h3>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                A foto do perfil é automaticamente sincronizada com sua conta GitHub
+                Clique na foto para alterar ou carregar uma nova imagem
               </p>
             </div>
           </div>
