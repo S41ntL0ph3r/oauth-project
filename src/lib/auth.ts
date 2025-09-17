@@ -14,18 +14,18 @@ export const {
   adapter: PrismaAdapter(db),
   pages: {
     signIn: "/sign-in",
-    signOut: "/",
     error: "/sign-in",
-    verifyRequest: "/verify",
   },
   session: {
     strategy: "jwt",
     maxAge: 3 * 24 * 60 * 60, // 3 dias
   },
+  trustHost: true, // Importante para NextAuth v5
+  secret: process.env.AUTH_SECRET,
   providers: [
     GitHub({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
+      clientId: process.env.AUTH_GITHUB_ID!,
+      clientSecret: process.env.AUTH_GITHUB_SECRET!,
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -79,6 +79,36 @@ export const {
       return token;
     },
   },
+  cookies: {
+    sessionToken: {
+      name: `authjs.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      }
+    },
+    callbackUrl: {
+      name: `authjs.callback-url`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      }
+    },
+    csrfToken: {
+      name: `authjs.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      }
+    },
+  },
+  debug: process.env.NODE_ENV === "development",
 });
 
 export const { GET, POST } = handlers;
