@@ -1,19 +1,13 @@
-name: Deploy Next.js to GitHub Pages
+name: Build and Deploy to GitHub Pages
 
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     
     steps:
     - name: Checkout 🛎️
@@ -33,16 +27,12 @@ jobs:
       env:
         NODE_ENV: production
         
-    - name: Setup Pages ⚙️
-      uses: actions/configure-pages@v4
-      with:
-        static_site_generator: next
+    - name: Add .nojekyll file 📄
+      run: touch ./out/.nojekyll
         
-    - name: Upload artifact 📤
-      uses: actions/upload-pages-artifact@v3
+    - name: Deploy to gh-pages branch �
+      uses: peaceiris/actions-gh-pages@v3
       with:
-        path: ./out
-        
-    - name: Deploy to GitHub Pages 🚀
-      id: deployment
-      uses: actions/deploy-pages@v4
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./out
+        publish_branch: gh-pages
