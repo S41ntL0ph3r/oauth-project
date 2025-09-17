@@ -1,13 +1,41 @@
+# Dependencies
 node_modules
-# Keep environment variables out of version control
+jspm_packages/
+
+# Environment variables (SENSÍVEL)
 .env
 .env.local
 .env.production
 .env.development
+.env.test
 
 # Next.js build outputs
 .next/
 out/
+
+# Database files (SENSÍVEL)
+*.db
+*.sqlite
+*.sqlite3
+/db/
+/prisma/dev.db
+/prisma/data/
+dev.db
+
+# User uploads (SENSÍVEL)
+/public/uploads/
+/uploads/
+public/uploads/avatars/*
+!public/uploads/avatars/.gitkeep
+
+# Logs (podem conter informações sensíveis)
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm
+logs/
 
 # Prisma
 /src/generated/prisma
@@ -28,13 +56,6 @@ out/
 ehthumbs.db
 Thumbs.db
 
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-
 # Runtime data
 pids
 *.pid
@@ -44,23 +65,15 @@ pids
 # Coverage directory used by tools like istanbul
 coverage/
 *.lcov
-
-# nyc test coverage
 .nyc_output
 
-# Dependency directories
-jspm_packages/
-
 # Optional npm cache directory
-.npm
-
-# Optional eslint cache
 .eslintcache
 
 # Yarn Integrity file
 .yarn-integrity
 
-# parcel-bundler cache (https://parceljs.org/)
+# parcel-bundler cache
 .cache
 .parcel-cache
 
@@ -70,3 +83,20 @@ jspm_packages/
 # Temporary folders
 tmp/
 temp/
+
+# Email templates internos (SENSÍVEL)
+/src/lib/internal/emailjs-config.tsx
+
+# Scripts de limpeza que podem conter caminhos sensíveis
+cleanup-*.js
+
+# Certificados e chaves (caso existam)
+*.pem
+*.key
+*.crt
+*.csr
+/certs/
+
+# Backup files
+*.bak
+*.backup
