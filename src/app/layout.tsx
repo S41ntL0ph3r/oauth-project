@@ -4,6 +4,7 @@ import { Metadata } from "next";
 import { SessionProvider } from "../components/session-provider";
 import { ThemeProvider } from "../contexts/theme-context";
 import { auth } from "@/lib/auth";
+import ServiceWorkerProvider from "../components/service-worker-provider";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -24,7 +25,11 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider>
-          <SessionProvider session={session}>{children}</SessionProvider>
+          <SessionProvider session={session}>
+            <ServiceWorkerProvider>
+              {children}
+            </ServiceWorkerProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

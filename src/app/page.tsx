@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -7,12 +7,35 @@ import Link from 'next/link';
 export default function HomePage() {
   const { status } = useSession();
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    if (status === 'authenticated') {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient && status === 'authenticated') {
       router.push('/home');
     }
-  }, [status, router]);
+  }, [status, router, isClient]);
+
+  // Evita hidration mismatch mostrando loading inicial
+  if (!isClient) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100">
+        <div className="max-w-md w-full text-center">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+            <div className="h-6 bg-gray-200 rounded w-full mb-8"></div>
+            <div className="space-y-4">
+              <div className="h-12 bg-gray-200 rounded"></div>
+              <div className="h-12 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-br from-blue-50 to-indigo-100">
