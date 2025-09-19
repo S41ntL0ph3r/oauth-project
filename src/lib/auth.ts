@@ -5,13 +5,6 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { compare } from "bcrypt";
 import db from "./db";
 
-// Debug das variáveis de ambiente
-console.log('🔍 Environment Variables Debug:');
-console.log('AUTH_SECRET:', process.env.AUTH_SECRET ? '✅ Set' : '❌ Missing');
-console.log('AUTH_GITHUB_ID:', process.env.AUTH_GITHUB_ID ? '✅ Set' : '❌ Missing');
-console.log('AUTH_GITHUB_SECRET:', process.env.AUTH_GITHUB_SECRET ? '✅ Set' : '❌ Missing');
-console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL ? '✅ Set' : '❌ Missing');
-
 export const {
   handlers,
   auth,
@@ -31,8 +24,13 @@ export const {
   secret: process.env.AUTH_SECRET,
   providers: [
     GitHub({
-      clientId: process.env.AUTH_GITHUB_ID!,
-      clientSecret: process.env.AUTH_GITHUB_SECRET!,
+      clientId: process.env.AUTH_GITHUB_ID as string,
+      clientSecret: process.env.AUTH_GITHUB_SECRET as string,
+      authorization: {
+        params: {
+          scope: "read:user user:email",
+        },
+      },
     }),
     CredentialsProvider({
       name: "Credentials",
