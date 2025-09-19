@@ -1,7 +1,7 @@
 // Configurações centralizadas do aplicativo
 export const APP_CONFIG = {
   name: 'OAuth Project',
-  url: process.env.NEXT_PUBLIC_NEXTAUTH_URL || 'http://localhost:3000',
+  url: process.env.NEXTAUTH_URL || 'http://localhost:3000',
   support: {
     email: 'suporte@oauthproject.com',
     name: 'OAuth Project - Suporte'
