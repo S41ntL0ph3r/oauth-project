@@ -5,6 +5,20 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { compare } from "bcrypt";
 import db from "./db";
 
+// Validação das variáveis de ambiente
+const requiredEnvVars = {
+  AUTH_SECRET: process.env.AUTH_SECRET,
+  AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID,
+  AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
+};
+
+// Verificar se todas as variáveis existem
+Object.entries(requiredEnvVars).forEach(([key, value]) => {
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${key}`);
+  }
+});
+
 export const {
   handlers,
   auth,
