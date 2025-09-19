@@ -17,20 +17,15 @@ export const {
     error: "/sign-in",
   },
   session: {
-    strategy: "jwt",
+    strategy: "database", // Mudança importante: usar database strategy com Prisma
     maxAge: 3 * 24 * 60 * 60, // 3 dias
   },
-  trustHost: true, // Importante para NextAuth v5
+  trustHost: true,
   secret: process.env.AUTH_SECRET,
   providers: [
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID as string,
       clientSecret: process.env.AUTH_GITHUB_SECRET as string,
-      authorization: {
-        params: {
-          scope: "read:user user:email",
-        },
-      },
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -71,46 +66,12 @@ export const {
     }),
   ],
   callbacks: {
-    async session({ session, token }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub;
+    async session({ session, user }) {
+      // Com database strategy, user vem do banco
+      if (user && session.user) {
+        session.user.id = user.id;
       }
       return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
-  },
-  cookies: {
-    sessionToken: {
-      name: `authjs.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      }
-    },
-    callbackUrl: {
-      name: `authjs.callback-url`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      }
-    },
-    csrfToken: {
-      name: `authjs.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      }
     },
   },
   debug: process.env.NODE_ENV === "development",
