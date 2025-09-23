@@ -31,7 +31,7 @@ export async function GET() {
     const response = NextResponse.json({ user });
     
     // Adicionar headers de cache
-    response.headers.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=60'); // 5 min cache, 1 min stale
+    response.headers.set('Cache-Control', 'private, max-age=300, stale-while-revalidate=60');
     response.headers.set('ETag', `"${user.updatedAt.getTime()}"`);
     response.headers.set('Last-Modified', user.updatedAt.toUTCString());
 

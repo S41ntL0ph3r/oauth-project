@@ -17,15 +17,14 @@ export const {
     error: "/sign-in",
   },
   session: {
-    strategy: "database", // Mudança importante: usar database strategy com Prisma
+    strategy: "database", // Voltar para database strategy com PostgreSQL
     maxAge: 3 * 24 * 60 * 60, // 3 dias
   },
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
   providers: [
     GitHub({
-      clientId: process.env.AUTH_GITHUB_ID as string,
-      clientSecret: process.env.AUTH_GITHUB_SECRET as string,
+      clientId: process.env.AUTH_GITHUB_ID!,
+      clientSecret: process.env.AUTH_GITHUB_SECRET!,
     }),
     CredentialsProvider({
       name: "Credentials",
