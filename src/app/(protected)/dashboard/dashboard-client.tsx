@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import useLocalStorage from '@/hooks/useLocalStorage';
+import useDataExport from '@/hooks/useDataExport';
 
 // Tipos
 type TransactionType = 'income' | 'expense';
@@ -35,6 +36,7 @@ type ActiveTab = 'overview' | 'transactions' | 'payments' | 'activities' | 'sett
 
 const DashboardClient: React.FC = () => {
   const { data: session } = useSession();
+  const { exportToCSV, exportToPDF } = useDataExport();
   
   // Estados principais com localStorage
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>('dashboard-transactions', []);
@@ -186,7 +188,7 @@ const DashboardClient: React.FC = () => {
       const expenseTransaction: Transaction = {
         id: generateUniqueId(),
         description: `Pagamento: ${editingPayment.description}`,
-        amount: -Math.abs(editingPayment.amount), // Garantir que seja negativo (despesa)
+        amount: editingPayment.amount, // Valor positivo para despesa
         type: 'expense',
         category: 'Pagamentos',
         date: new Date().toISOString().split('T')[0]
@@ -281,6 +283,60 @@ const DashboardClient: React.FC = () => {
     setPaymentToDelete(null);
     setShowDeletePaymentConfirm(false);
   }, [paymentToDelete, setPayments, setActivities, generateUniqueId]);
+
+  // Função para preparar dados de exportação
+  const prepareExportData = useCallback(() => {
+    return {
+      transactions,
+      payments,
+      activities,
+      summary: {
+        totalIncome,
+        totalExpenses,
+        balance: calculatedBalance,
+        totalTransactions: transactions.length,
+        totalPayments: payments.length
+      }
+    };
+  }, [transactions, payments, activities, totalIncome, totalExpenses, calculatedBalance]);
+
+  // Função para exportar CSV
+  const handleExportCSV = useCallback(() => {
+    const data = prepareExportData();
+    const result = exportToCSV(data);
+    
+    if (result.success) {
+      const exportActivity: Activity = {
+        id: generateUniqueId(),
+        description: 'Dados exportados em formato CSV',
+        type: 'transaction',
+        timestamp: new Date().toISOString()
+      };
+      setActivities(prev => [exportActivity, ...prev]);
+    }
+    
+    // Mostrar feedback visual (você pode adicionar um toast aqui)
+    console.log(result.message);
+  }, [prepareExportData, exportToCSV, generateUniqueId, setActivities]);
+
+  // Função para exportar PDF
+  const handleExportPDF = useCallback(() => {
+    const data = prepareExportData();
+    const result = exportToPDF(data);
+    
+    if (result.success) {
+      const exportActivity: Activity = {
+        id: generateUniqueId(),
+        description: 'Dados exportados em formato PDF',
+        type: 'transaction',
+        timestamp: new Date().toISOString()
+      };
+      setActivities(prev => [exportActivity, ...prev]);
+    }
+    
+    // Mostrar feedback visual (você pode adicionar um toast aqui)
+    console.log(result.message);
+  }, [prepareExportData, exportToPDF, generateUniqueId, setActivities]);
   
   // Função para renderizar o conteúdo ativo
   const renderActiveTab = () => {
@@ -978,13 +1034,42 @@ const DashboardClient: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Dashboard Financeiro</h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          {isClient && session ? 
-            `Bem-vindo, ${session.user?.name || session.user?.email}! Gerencie suas finanças aqui.` :
-            'Bem-vindo! Gerencie suas finanças aqui.'
-          }
-        </p>
+        <div className="flex justify-between items-start mb-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Dashboard Financeiro</h1>
+            <p className="text-gray-600 dark:text-gray-300">
+              {isClient && session ? 
+                `Bem-vindo, ${session.user?.name || session.user?.email}! Gerencie suas finanças aqui.` :
+                'Bem-vindo! Gerencie suas finanças aqui.'
+              }
+            </p>
+          </div>
+          
+          {/* Botões de Exportação */}
+          <div className="flex space-x-3">
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              title="Exportar dados para CSV"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              </svg>
+              CSV
+            </button>
+            
+            <button
+              onClick={handleExportPDF}
+              className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              title="Exportar relatório em PDF"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+              </svg>
+              PDF
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Navegação de Abas */}
