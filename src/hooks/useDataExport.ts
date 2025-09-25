@@ -45,55 +45,122 @@ const useDataExport = () => {
   // Função para exportar em CSV
   const exportToCSV = useCallback((data: ExportData, filename?: string) => {
     try {
-      const exportDate = new Date().toLocaleDateString('pt-BR');
-      const csvFilename = filename || `relatorio_financeiro_${new Date().toISOString().split('T')[0]}.csv`;
+      const exportDateTime = new Date().toLocaleString('pt-BR');
+      const csvFilename = filename || `extrato_movimentacoes_${new Date().toISOString().split('T')[0]}.csv`;
 
-      // Preparar dados das transações
-      const transactionsData = data.transactions.map(transaction => ({
-        'Tipo': 'Transação',
-        'Descrição': transaction.description,
-        'Categoria': transaction.category,
-        'Tipo de Transação': transaction.type === 'income' ? 'Receita' : 'Despesa',
-        'Valor (R$)': transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-        'Data': new Date(transaction.date).toLocaleDateString('pt-BR'),
-        'Status': '-'
-      }));
-
-      // Preparar dados dos pagamentos
-      const paymentsData = data.payments.map(payment => ({
-        'Tipo': 'Pagamento',
-        'Descrição': payment.description,
-        'Categoria': 'Pagamentos',
-        'Tipo de Transação': 'Despesa',
-        'Valor (R$)': payment.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
-        'Data': new Date(payment.dueDate).toLocaleDateString('pt-BR'),
-        'Status': payment.status === 'completed' ? 'Pago' : 
-                 payment.status === 'overdue' ? 'Vencido' : 'Pendente'
-      }));
-
-      // Combinar dados
-      const allData = [...transactionsData, ...paymentsData];
-
-      // Adicionar resumo no final
-      const summaryData = [
-        { 'Tipo': '', 'Descrição': '', 'Categoria': '', 'Tipo de Transação': '', 'Valor (R$)': '', 'Data': '', 'Status': '' },
-        { 'Tipo': 'RESUMO', 'Descrição': '', 'Categoria': '', 'Tipo de Transação': '', 'Valor (R$)': '', 'Data': '', 'Status': '' },
-        { 'Tipo': 'Total Receitas', 'Descrição': '', 'Categoria': '', 'Tipo de Transação': '', 'Valor (R$)': data.summary.totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 }), 'Data': '', 'Status': '' },
-        { 'Tipo': 'Total Despesas', 'Descrição': '', 'Categoria': '', 'Tipo de Transação': '', 'Valor (R$)': data.summary.totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 }), 'Data': '', 'Status': '' },
-        { 'Tipo': 'Saldo Líquido', 'Descrição': '', 'Categoria': '', 'Tipo de Transação': '', 'Valor (R$)': data.summary.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 }), 'Data': '', 'Status': '' },
-        { 'Tipo': 'Data da Exportação', 'Descrição': exportDate, 'Categoria': '', 'Tipo de Transação': '', 'Valor (R$)': '', 'Data': '', 'Status': '' },
+      // Criar cabeçalho informativo para Excel
+      const headerInfo = [
+        ['EXTRATO DE MOVIMENTAÇÕES FINANCEIRAS - SISTEMA DE GESTÃO'],
+        [''],
+        ['Data de Geração:', exportDateTime],
+        ['Total de Transações:', data.transactions.length.toString()],
+        ['Total de Pagamentos:', data.payments.length.toString()],
+        ['Total de Movimentações:', (data.transactions.length + data.payments.length).toString()],
+        [''],
+        ['RESUMO FINANCEIRO'],
+        ['Categoria', 'Valor (R$)'],
+        ['Total de Receitas', data.summary.totalIncome.toString().replace('.', ',')],
+        ['Total de Despesas', data.summary.totalExpenses.toString().replace('.', ',')],
+        ['Saldo Líquido', data.summary.balance.toString().replace('.', ',')],
+        [''],
+        ['DETALHAMENTO DAS MOVIMENTAÇÕES'],
+        ['Data', 'Tipo Movimentação', 'Categoria', 'Descrição', 'Valor Original', 'Débito', 'Crédito', 'Saldo Acumulado', 'Documento', 'Status', 'Vencimento', 'Observações']
       ];
 
-      const finalData = [...allData, ...summaryData];
+      // Preparar todas as movimentações ordenadas por data
+      const allMovements = [
+        ...data.transactions.map(transaction => ({
+          date: new Date(transaction.date),
+          type: 'TRANSAÇÃO',
+          category: transaction.category,
+          description: transaction.description,
+          originalAmount: transaction.amount,
+          isCredit: transaction.type === 'income',
+          document: transaction.id.slice(-8).toUpperCase(),
+          status: 'CONCLUÍDA',
+          dueDate: transaction.date,
+          observations: transaction.type === 'income' ? 'Receita registrada' : 'Despesa registrada'
+        })),
+        ...data.payments.map(payment => ({
+          date: new Date(payment.dueDate),
+          type: 'PAGAMENTO',
+          category: 'Pagamentos',
+          description: payment.description,
+          originalAmount: payment.amount,
+          isCredit: false,
+          document: payment.id.slice(-8).toUpperCase(),
+          status: payment.status === 'completed' ? 'PAGO' : 
+                 payment.status === 'overdue' ? 'VENCIDO' : 'PENDENTE',
+          dueDate: payment.dueDate,
+          observations: `Pagamento ${payment.status === 'completed' ? 'realizado' : 
+                       payment.status === 'overdue' ? 'em atraso' : 'pendente'}`
+        }))
+      ].sort((a, b) => a.date.getTime() - b.date.getTime());
 
-      // Converter para CSV
-      const csv = Papa.unparse(finalData, {
-        delimiter: ';',
-        header: true
+      // Calcular saldo acumulado
+      let saldoAcumulado = 0;
+      const movementRows = allMovements.map(movement => {
+        const valor = movement.isCredit ? movement.originalAmount : -movement.originalAmount;
+        saldoAcumulado += valor;
+
+        return [
+          movement.date.toLocaleDateString('pt-BR'),
+          movement.type,
+          movement.category,
+          movement.description,
+          movement.originalAmount.toString().replace('.', ','),
+          movement.isCredit ? '' : movement.originalAmount.toString().replace('.', ','),
+          movement.isCredit ? movement.originalAmount.toString().replace('.', ',') : '',
+          saldoAcumulado.toString().replace('.', ','),
+          movement.document,
+          movement.status,
+          new Date(movement.dueDate).toLocaleDateString('pt-BR'),
+          movement.observations
+        ];
       });
 
-      // Download do arquivo
-      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      // Adicionar linha de totais com fórmulas Excel
+      const lastRow = headerInfo.length + movementRows.length + 1;
+      const totalRows = [
+        [''],
+        ['TOTAIS CALCULADOS (Fórmulas Excel)'],
+        ['Total de Débitos:', `=SOMA(F${headerInfo.length + 1}:F${lastRow})`],
+        ['Total de Créditos:', `=SOMA(G${headerInfo.length + 1}:G${lastRow})`],
+        ['Saldo Final:', `=G${lastRow + 3}-F${lastRow + 3}`],
+        [''],
+        ['ANÁLISES AUXILIARES'],
+        ['Maior Débito:', `=MÁXIMO(F${headerInfo.length + 1}:F${lastRow})`],
+        ['Maior Crédito:', `=MÁXIMO(G${headerInfo.length + 1}:G${lastRow})`],
+        ['Média de Débitos:', `=MÉDIA(F${headerInfo.length + 1}:F${lastRow})`],
+        ['Média de Créditos:', `=MÉDIA(G${headerInfo.length + 1}:G${lastRow})`],
+        ['Quantidade de Débitos:', `=CONT.VALORES(F${headerInfo.length + 1}:F${lastRow})`],
+        ['Quantidade de Créditos:', `=CONT.VALORES(G${headerInfo.length + 1}:G${lastRow})`],
+        [''],
+        ['CATEGORIAS MAIS UTILIZADAS'],
+        ['=ÚNICO(C${headerInfo.length + 1}:C${lastRow})']
+      ];
+
+      // Combinar todos os dados
+      const finalData = [...headerInfo, ...movementRows, ...totalRows];
+
+      // Configuração especial para Excel
+      const csv = Papa.unparse(finalData, {
+        delimiter: ';', // Padrão brasileiro para Excel
+        header: false,  // Não adicionar cabeçalho automático pois já temos
+        quotes: true,   // Aspas em todos os campos para preservar formatação
+        quoteChar: '"',
+        escapeChar: '"',
+        skipEmptyLines: false
+      });
+
+      // Adicionar BOM (Byte Order Mark) para UTF-8 e caracteres especiais
+      const csvWithBOM = '\uFEFF' + csv;
+
+      // Criar e baixar arquivo
+      const blob = new Blob([csvWithBOM], { 
+        type: 'text/csv;charset=utf-8;' 
+      });
+      
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
@@ -103,10 +170,13 @@ const useDataExport = () => {
       link.click();
       document.body.removeChild(link);
 
-      return { success: true, message: 'Arquivo CSV exportado com sucesso!' };
+      // Limpar URL
+      URL.revokeObjectURL(url);
+
+      return { success: true, message: 'Arquivo CSV otimizado para Excel exportado com sucesso!' };
     } catch (error) {
       console.error('Erro ao exportar CSV:', error);
-      return { success: false, message: 'Erro ao exportar arquivo CSV' };
+      return { success: false, message: 'Erro ao exportar arquivo CSV para Excel' };
     }
   }, []);
 
