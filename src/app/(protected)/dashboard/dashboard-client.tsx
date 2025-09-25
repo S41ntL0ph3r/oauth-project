@@ -303,8 +303,11 @@ const DashboardClient: React.FC = () => {
 
   // Função para exportar CSV
   const handleExportCSV = useCallback(() => {
+    console.log('handleExportCSV chamado');
     const data = prepareExportData();
+    console.log('Dados preparados:', data);
     const result = exportToCSV(data);
+    console.log('Resultado exportToCSV:', result);
     
     if (result.success) {
       const exportActivity: Activity = {
@@ -322,8 +325,11 @@ const DashboardClient: React.FC = () => {
 
   // Função para exportar PDF
   const handleExportPDF = useCallback(() => {
+    console.log('handleExportPDF chamado');
     const data = prepareExportData();
+    console.log('Dados preparados:', data);
     const result = exportToPDF(data);
+    console.log('Resultado exportToPDF:', result);
     
     if (result.success) {
       const exportActivity: Activity = {
@@ -1446,12 +1452,14 @@ const DashboardClient: React.FC = () => {
                   handleExportCSV();
                   setShowExportModal(false);
                 }}
-                className="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                className="w-full flex items-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
-                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <div className="text-left">
+                <div className="flex items-center justify-center w-8 h-8 bg-green-500 rounded-full mr-3 flex-shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div className="text-left flex-1">
                   <div className="font-medium">Exportar como CSV</div>
                   <div className="text-sm text-green-200">Ideal para planilhas (Excel, Google Sheets)</div>
                 </div>
@@ -1459,15 +1467,18 @@ const DashboardClient: React.FC = () => {
 
               <button
                 onClick={() => {
+                  console.log('Clicou no botão PDF');
                   handleExportPDF();
                   setShowExportModal(false);
                 }}
-                className="w-full flex items-center justify-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="w-full flex items-center px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
-                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                <div className="text-left">
+                <div className="flex items-center justify-center w-8 h-8 bg-red-500 rounded-full mr-3 flex-shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="text-left flex-1">
                   <div className="font-medium">Exportar como PDF</div>
                   <div className="text-sm text-red-200">Relatório formatado para impressão</div>
                 </div>
