@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import jsPDF from 'jspdf';
-import Papa from 'papaparse';
 
 // Definir as interfaces necessárias
 interface Transaction {
@@ -46,28 +45,8 @@ const useDataExport = () => {
   const exportToCSV = useCallback((data: ExportData, filename?: string) => {
     try {
       const exportDateTime = new Date().toLocaleString('pt-BR');
-      const csvFilename = filename || `extrato_movimentacoes_${new Date().toISOString().split('T')[0]}.csv`;
-
-      // Criar cabeçalho informativo para Excel
-      const headerInfo = [
-        ['EXTRATO DE MOVIMENTAÇÕES FINANCEIRAS - SISTEMA DE GESTÃO'],
-        [''],
-        ['Data de Geração:', exportDateTime],
-        ['Total de Transações:', data.transactions.length.toString()],
-        ['Total de Pagamentos:', data.payments.length.toString()],
-        ['Total de Movimentações:', (data.transactions.length + data.payments.length).toString()],
-        [''],
-        ['RESUMO FINANCEIRO'],
-        ['Categoria', 'Valor (R$)', '', '', '', '', '', '', '', '', ''],
-        ['Total de Receitas', data.summary.totalIncome.toString().replace('.', ','), '', '', '', '', '', '', '', '', ''],
-        ['Total de Despesas', data.summary.totalExpenses.toString().replace('.', ','), '', '', '', '', '', '', '', '', ''],
-        ['Saldo Líquido', data.summary.balance.toString().replace('.', ','), '', '', '', '', '', '', '', '', ''],
-        [''],
-        ['═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════'],
-        ['TABELA DE MOVIMENTAÇÕES DETALHADAS'],
-        ['═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════'],
-        ['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor Original', 'Débito', 'Crédito', 'Saldo Acumulado', 'Documento', 'Status', 'Vencimento', 'Observações']
-      ];
+      // Alterar extensão para .xls para forçar Excel a aplicar formatação automática
+      const csvFilename = filename || `extrato_movimentacoes_${new Date().toISOString().split('T')[0]}.xls`;
 
       // Preparar todas as movimentações ordenadas por data
       const allMovements = [
@@ -99,80 +78,121 @@ const useDataExport = () => {
         }))
       ].sort((a, b) => a.date.getTime() - b.date.getTime());
 
-      // Calcular saldo acumulado
+      // Criar HTML simples que o Excel reconhece como tabela
+      let htmlContent = `
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body { font-family: Calibri, sans-serif; font-size: 11pt; }
+.header { font-size: 14pt; font-weight: bold; text-align: center; margin-bottom: 20px; }
+.summary { margin-bottom: 20px; }
+.summary-title { font-weight: bold; margin-bottom: 10px; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+th { background-color: #4472C4; color: white; font-weight: bold; padding: 8px; border: 1px solid #000; text-align: center; }
+td { padding: 6px; border: 1px solid #CCCCCC; }
+.number { text-align: right; }
+.center { text-align: center; }
+.alternate { background-color: #F2F2F2; }
+.total-row { font-weight: bold; background-color: #D5E3F0; }
+.formula { font-style: italic; color: #0070C0; }
+</style>
+</head>
+<body>
+<div class="header">EXTRATO DE MOVIMENTAÇÕES FINANCEIRAS - SISTEMA DE GESTÃO</div>
+
+<div class="summary">
+<div class="summary-title">INFORMAÇÕES GERAIS</div>
+<p><strong>Data de Geração:</strong> ${exportDateTime}</p>
+<p><strong>Total de Transações:</strong> ${data.transactions.length}</p>
+<p><strong>Total de Pagamentos:</strong> ${data.payments.length}</p>
+<p><strong>Total de Movimentações:</strong> ${data.transactions.length + data.payments.length}</p>
+</div>
+
+<div class="summary">
+<div class="summary-title">RESUMO FINANCEIRO</div>
+<table>
+<tr><th>Categoria</th><th>Valor (R$)</th></tr>
+<tr><td><strong>Total de Receitas</strong></td><td class="number">${data.summary.totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
+<tr class="alternate"><td><strong>Total de Despesas</strong></td><td class="number">${data.summary.totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
+<tr class="total-row"><td><strong>Saldo Líquido</strong></td><td class="number">${data.summary.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td></tr>
+</table>
+</div>
+
+<div class="summary-title">DETALHAMENTO DAS MOVIMENTAÇÕES</div>
+<table>
+<tr>
+<th>Data</th>
+<th>Tipo</th>
+<th>Categoria</th>
+<th>Descrição</th>
+<th>Valor Original</th>
+<th>Débito</th>
+<th>Crédito</th>
+<th>Saldo Acumulado</th>
+<th>Documento</th>
+<th>Status</th>
+<th>Vencimento</th>
+<th>Observações</th>
+</tr>`;
+
+      // Calcular saldo acumulado e adicionar linhas de dados
       let saldoAcumulado = 0;
-      const movementRows = allMovements.map(movement => {
+      allMovements.forEach((movement, index) => {
         const valor = movement.isCredit ? movement.originalAmount : -movement.originalAmount;
         saldoAcumulado += valor;
-
-        return [
-          movement.date.toLocaleDateString('pt-BR'),
-          movement.type,
-          movement.category,
-          movement.description,
-          movement.originalAmount.toString().replace('.', ','),
-          movement.isCredit ? '' : movement.originalAmount.toString().replace('.', ','),
-          movement.isCredit ? movement.originalAmount.toString().replace('.', ',') : '',
-          saldoAcumulado.toString().replace('.', ','),
-          movement.document,
-          movement.status,
-          new Date(movement.dueDate).toLocaleDateString('pt-BR'),
-          movement.observations
-        ];
+        const isAlternate = index % 2 === 1;
+        
+        htmlContent += `
+<tr${isAlternate ? ' class="alternate"' : ''}>
+<td class="center">${movement.date.toLocaleDateString('pt-BR')}</td>
+<td>${movement.type}</td>
+<td>${movement.category}</td>
+<td>${movement.description}</td>
+<td class="number">${movement.originalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+<td class="number">${movement.isCredit ? '' : movement.originalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+<td class="number">${movement.isCredit ? movement.originalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : ''}</td>
+<td class="number">${saldoAcumulado.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+<td class="center">${movement.document}</td>
+<td class="center">${movement.status}</td>
+<td class="center">${new Date(movement.dueDate).toLocaleDateString('pt-BR')}</td>
+<td>${movement.observations}</td>
+</tr>`;
       });
 
-      // Linha de fechamento da tabela
-      const tableEnd = [
-        ['═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════'],
-        ['']
-      ];
+      // Adicionar linha de totais
+      htmlContent += `
+<tr class="total-row">
+<td colspan="5"><strong>TOTAIS:</strong></td>
+<td class="number"><strong>${data.summary.totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></td>
+<td class="number"><strong>${data.summary.totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></td>
+<td class="number"><strong>${data.summary.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</strong></td>
+<td colspan="4"></td>
+</tr>
+</table>
 
-      // Calcular posição das fórmulas baseado no número real de linhas
-      const dataStartRow = headerInfo.length + 1; // Linha onde começam os dados
-      const dataEndRow = dataStartRow + movementRows.length - 1; // Última linha de dados
-      const formulaStartRow = dataEndRow + tableEnd.length + 2; // Onde começam as fórmulas
+<div class="summary">
+<div class="summary-title">ANÁLISES ESTATÍSTICAS</div>
+<table>
+<tr><th>Métrica</th><th>Valor</th></tr>
+<tr><td>Maior Débito</td><td class="number">${allMovements.filter(m => !m.isCredit).length > 0 ? Math.max(...allMovements.filter(m => !m.isCredit).map(m => m.originalAmount)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}</td></tr>
+<tr class="alternate"><td>Maior Crédito</td><td class="number">${allMovements.filter(m => m.isCredit).length > 0 ? Math.max(...allMovements.filter(m => m.isCredit).map(m => m.originalAmount)).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}</td></tr>
+<tr><td>Média de Débitos</td><td class="number">${allMovements.filter(m => !m.isCredit).length > 0 ? (allMovements.filter(m => !m.isCredit).reduce((sum, m) => sum + m.originalAmount, 0) / allMovements.filter(m => !m.isCredit).length).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}</td></tr>
+<tr class="alternate"><td>Média de Créditos</td><td class="number">${allMovements.filter(m => m.isCredit).length > 0 ? (allMovements.filter(m => m.isCredit).reduce((sum, m) => sum + m.originalAmount, 0) / allMovements.filter(m => m.isCredit).length).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : '0,00'}</td></tr>
+<tr><td>Quantidade de Débitos</td><td class="number">${allMovements.filter(m => !m.isCredit).length}</td></tr>
+<tr class="alternate"><td>Quantidade de Créditos</td><td class="number">${allMovements.filter(m => m.isCredit).length}</td></tr>
+</table>
+</div>
 
-      // Adicionar fórmulas Excel com referências corretas
-      const excelFormulas = [
-        ['TOTAIS CALCULADOS (Fórmulas Excel)', '', '', '', '', '', '', '', '', '', ''],
-        [`Total de Débitos:`, `=SOMA(F${dataStartRow}:F${dataEndRow})`, '', '', '', '', '', '', '', '', ''],
-        [`Total de Créditos:`, `=SOMA(G${dataStartRow}:G${dataEndRow})`, '', '', '', '', '', '', '', '', ''],
-        [`Saldo Final:`, `=G${formulaStartRow + 1}-F${formulaStartRow + 1}`, '', '', '', '', '', '', '', '', ''],
-        [''],
-        ['ANÁLISES AUXILIARES', '', '', '', '', '', '', '', '', '', ''],
-        [`Maior Débito:`, `=SE(CONT.VALORES(F${dataStartRow}:F${dataEndRow})>0;MÁXIMO(F${dataStartRow}:F${dataEndRow});0)`, '', '', '', '', '', '', '', '', ''],
-        [`Maior Crédito:`, `=SE(CONT.VALORES(G${dataStartRow}:G${dataEndRow})>0;MÁXIMO(G${dataStartRow}:G${dataEndRow});0)`, '', '', '', '', '', '', '', '', ''],
-        [`Média de Débitos:`, `=SE(CONT.VALORES(F${dataStartRow}:F${dataEndRow})>0;MÉDIA(F${dataStartRow}:F${dataEndRow});0)`, '', '', '', '', '', '', '', '', ''],
-        [`Média de Créditos:`, `=SE(CONT.VALORES(G${dataStartRow}:G${dataEndRow})>0;MÉDIA(G${dataStartRow}:G${dataEndRow});0)`, '', '', '', '', '', '', '', '', ''],
-        [`Qtd de Débitos:`, `=CONT.VALORES(F${dataStartRow}:F${dataEndRow})`, '', '', '', '', '', '', '', '', ''],
-        [`Qtd de Créditos:`, `=CONT.VALORES(G${dataStartRow}:G${dataEndRow})`, '', '', '', '', '', '', '', '', ''],
-        [''],
-        ['INSTRUÇÕES PARA FORMATAÇÃO AUTOMÁTICA:', '', '', '', '', '', '', '', '', '', ''],
-        ['1. Selecione os dados da tabela (incluindo cabeçalhos)', '', '', '', '', '', '', '', '', '', ''],
-        ['2. Pressione Ctrl+T ou vá em Inserir > Tabela', '', '', '', '', '', '', '', '', '', ''],
-        ['3. Marque "Minha tabela tem cabeçalhos" e clique OK', '', '', '', '', '', '', '', '', '', ''],
-        ['4. Escolha um estilo de tabela no menu Design', '', '', '', '', '', '', '', '', '', '']
-      ];
+<p><em>Documento gerado automaticamente em ${exportDateTime}</em></p>
+<p><em>Este arquivo pode ser salvo como Excel (.xlsx) através do menu Arquivo > Salvar Como</em></p>
 
-      // Combinar todos os dados
-      const finalData = [...headerInfo, ...movementRows, ...tableEnd, ...excelFormulas];
+</body>
+</html>`;
 
-      // Configuração especial para Excel com formatação de tabela
-      const csv = Papa.unparse(finalData, {
-        delimiter: ';', // Padrão brasileiro para Excel
-        header: false,  // Não adicionar cabeçalho automático
-        quotes: false,  // Sem aspas para melhor formatação
-        quoteChar: '"',
-        escapeChar: '"',
-        skipEmptyLines: false
-      });
-
-      // Adicionar BOM (Byte Order Mark) para UTF-8
-      const csvWithBOM = '\uFEFF' + csv;
-
-      // Criar e baixar arquivo
-      const blob = new Blob([csvWithBOM], { 
-        type: 'text/csv;charset=utf-8;' 
+      // Criar e baixar arquivo HTML que o Excel reconhece
+      const blob = new Blob([htmlContent], { 
+        type: 'application/vnd.ms-excel;charset=utf-8;' 
       });
       
       const link = document.createElement('a');
@@ -187,10 +207,10 @@ const useDataExport = () => {
       // Limpar URL
       URL.revokeObjectURL(url);
 
-      return { success: true, message: 'Arquivo CSV formatado para tabela Excel exportado com sucesso!' };
+      return { success: true, message: 'Planilha Excel formatada exportada com sucesso!' };
     } catch (error) {
-      console.error('Erro ao exportar CSV:', error);
-      return { success: false, message: 'Erro ao exportar arquivo CSV para Excel' };
+      console.error('Erro ao exportar Excel:', error);
+      return { success: false, message: 'Erro ao exportar planilha Excel' };
     }
   }, []);
 
