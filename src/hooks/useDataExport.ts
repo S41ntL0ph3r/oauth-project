@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
 import Papa from 'papaparse';
 
 // Definir as interfaces necessárias
@@ -39,16 +38,6 @@ interface ExportData {
     totalTransactions: number;
     totalPayments: number;
   };
-}
-
-// Estender o tipo jsPDF para incluir autoTable
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: Record<string, unknown>) => jsPDF;
-    lastAutoTable?: {
-      finalY: number;
-    };
-  }
 }
 
 const useDataExport = () => {
@@ -129,42 +118,39 @@ const useDataExport = () => {
       const exportDate = new Date().toLocaleDateString('pt-BR');
       const pdfFilename = filename || `relatorio_financeiro_${new Date().toISOString().split('T')[0]}.pdf`;
 
+      let yPosition = 25;
+
       // Título
       doc.setFontSize(20);
-      doc.text('Relatório Financeiro', pageWidth / 2, 25, { align: 'center' });
+      doc.text('Relatório Financeiro', pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 15;
 
       // Data de exportação
       doc.setFontSize(12);
-      doc.text(`Exportado em: ${exportDate}`, pageWidth / 2, 35, { align: 'center' });
+      doc.text(`Exportado em: ${exportDate}`, pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 25;
 
       // Resumo financeiro
-      let yPosition = 55;
       doc.setFontSize(16);
       doc.text('Resumo Financeiro', 20, yPosition);
+      yPosition += 15;
 
-      const summaryItems = [
-        ['Total de Receitas', `R$ ${data.summary.totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`],
-        ['Total de Despesas', `R$ ${data.summary.totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`],
-        ['Saldo Líquido', `R$ ${data.summary.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`],
-        ['Total de Transações', data.summary.totalTransactions.toString()],
-        ['Total de Pagamentos', data.summary.totalPayments.toString()]
+      // Dados do resumo
+      doc.setFontSize(12);
+      const summaryLines = [
+        `Total de Receitas: R$ ${data.summary.totalIncome.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `Total de Despesas: R$ ${data.summary.totalExpenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `Saldo Líquido: R$ ${data.summary.balance.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+        `Total de Transações: ${data.summary.totalTransactions}`,
+        `Total de Pagamentos: ${data.summary.totalPayments}`
       ];
 
-      // Tabela de resumo
-      doc.autoTable({
-        startY: yPosition + 15,
-        head: [['Item', 'Valor']],
-        body: summaryItems,
-        theme: 'grid',
-        styles: { fontSize: 10 },
-        headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-        columnStyles: {
-          0: { cellWidth: 80 },
-          1: { cellWidth: 60, halign: 'right' }
-        }
+      summaryLines.forEach(line => {
+        doc.text(line, 20, yPosition);
+        yPosition += 8;
       });
 
-      yPosition = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 20 : 150;
+      yPosition += 15;
 
       // Transações
       if (data.transactions.length > 0) {
@@ -175,25 +161,28 @@ const useDataExport = () => {
 
         doc.setFontSize(16);
         doc.text('Transações', 20, yPosition);
+        yPosition += 15;
 
-        const transactionsTableData = data.transactions.map(transaction => [
-          transaction.description,
-          transaction.category,
-          transaction.type === 'income' ? 'Receita' : 'Despesa',
-          `R$ ${transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-          new Date(transaction.date).toLocaleDateString('pt-BR')
-        ]);
+        doc.setFontSize(10);
+        
+        data.transactions.forEach((transaction, index) => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 25;
+          }
 
-        doc.autoTable({
-          startY: yPosition + 10,
-          head: [['Descrição', 'Categoria', 'Tipo', 'Valor', 'Data']],
-          body: transactionsTableData,
-          theme: 'striped',
-          styles: { fontSize: 9 },
-          headStyles: { fillColor: [52, 152, 219], textColor: 255 }
+          const typeText = transaction.type === 'income' ? 'Receita' : 'Despesa';
+          const amountText = `R$ ${transaction.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+          const dateText = new Date(transaction.date).toLocaleDateString('pt-BR');
+
+          doc.text(`${index + 1}. ${transaction.description}`, 20, yPosition);
+          doc.text(`${transaction.category} | ${typeText}`, 20, yPosition + 6);
+          doc.text(`${amountText} | ${dateText}`, 20, yPosition + 12);
+          
+          yPosition += 20;
         });
 
-        yPosition = doc.lastAutoTable?.finalY ? doc.lastAutoTable.finalY + 20 : yPosition + 50;
+        yPosition += 15;
       }
 
       // Pagamentos
@@ -205,22 +194,26 @@ const useDataExport = () => {
 
         doc.setFontSize(16);
         doc.text('Pagamentos', 20, yPosition);
+        yPosition += 15;
 
-        const paymentsTableData = data.payments.map(payment => [
-          payment.description,
-          `R$ ${payment.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
-          new Date(payment.dueDate).toLocaleDateString('pt-BR'),
-          payment.status === 'completed' ? 'Pago' : 
-          payment.status === 'overdue' ? 'Vencido' : 'Pendente'
-        ]);
+        doc.setFontSize(10);
 
-        doc.autoTable({
-          startY: yPosition + 10,
-          head: [['Descrição', 'Valor', 'Vencimento', 'Status']],
-          body: paymentsTableData,
-          theme: 'striped',
-          styles: { fontSize: 9 },
-          headStyles: { fillColor: [155, 89, 182], textColor: 255 }
+        data.payments.forEach((payment, index) => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 25;
+          }
+
+          const statusText = payment.status === 'completed' ? 'Pago' : 
+                           payment.status === 'overdue' ? 'Vencido' : 'Pendente';
+          const amountText = `R$ ${payment.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+          const dueDateText = new Date(payment.dueDate).toLocaleDateString('pt-BR');
+
+          doc.text(`${index + 1}. ${payment.description}`, 20, yPosition);
+          doc.text(`${amountText} | Venc: ${dueDateText}`, 20, yPosition + 6);
+          doc.text(`Status: ${statusText}`, 20, yPosition + 12);
+          
+          yPosition += 20;
         });
       }
 
