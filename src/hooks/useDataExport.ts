@@ -58,13 +58,15 @@ const useDataExport = () => {
         ['Total de Movimentações:', (data.transactions.length + data.payments.length).toString()],
         [''],
         ['RESUMO FINANCEIRO'],
-        ['Categoria', 'Valor (R$)'],
-        ['Total de Receitas', data.summary.totalIncome.toString().replace('.', ',')],
-        ['Total de Despesas', data.summary.totalExpenses.toString().replace('.', ',')],
-        ['Saldo Líquido', data.summary.balance.toString().replace('.', ',')],
+        ['Categoria', 'Valor (R$)', '', '', '', '', '', '', '', '', ''],
+        ['Total de Receitas', data.summary.totalIncome.toString().replace('.', ','), '', '', '', '', '', '', '', '', ''],
+        ['Total de Despesas', data.summary.totalExpenses.toString().replace('.', ','), '', '', '', '', '', '', '', '', ''],
+        ['Saldo Líquido', data.summary.balance.toString().replace('.', ','), '', '', '', '', '', '', '', '', ''],
         [''],
-        ['DETALHAMENTO DAS MOVIMENTAÇÕES'],
-        ['Data', 'Tipo Movimentação', 'Categoria', 'Descrição', 'Valor Original', 'Débito', 'Crédito', 'Saldo Acumulado', 'Documento', 'Status', 'Vencimento', 'Observações']
+        ['═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════'],
+        ['TABELA DE MOVIMENTAÇÕES DETALHADAS'],
+        ['═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════'],
+        ['Data', 'Tipo', 'Categoria', 'Descrição', 'Valor Original', 'Débito', 'Crédito', 'Saldo Acumulado', 'Documento', 'Status', 'Vencimento', 'Observações']
       ];
 
       // Preparar todas as movimentações ordenadas por data
@@ -77,7 +79,7 @@ const useDataExport = () => {
           originalAmount: transaction.amount,
           isCredit: transaction.type === 'income',
           document: transaction.id.slice(-8).toUpperCase(),
-          status: 'CONCLUÍDA',
+          status: transaction.type === 'income' ? 'CONCLUÍDA' : 'CONCLUÍDA',
           dueDate: transaction.date,
           observations: transaction.type === 'income' ? 'Receita registrada' : 'Despesa registrada'
         })),
@@ -119,41 +121,53 @@ const useDataExport = () => {
         ];
       });
 
-      // Adicionar linha de totais com fórmulas Excel
-      const lastRow = headerInfo.length + movementRows.length + 1;
-      const totalRows = [
+      // Linha de fechamento da tabela
+      const tableEnd = [
+        ['═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════'],
+        ['']
+      ];
+
+      // Calcular posição das fórmulas baseado no número real de linhas
+      const dataStartRow = headerInfo.length + 1; // Linha onde começam os dados
+      const dataEndRow = dataStartRow + movementRows.length - 1; // Última linha de dados
+      const formulaStartRow = dataEndRow + tableEnd.length + 2; // Onde começam as fórmulas
+
+      // Adicionar fórmulas Excel com referências corretas
+      const excelFormulas = [
+        ['TOTAIS CALCULADOS (Fórmulas Excel)', '', '', '', '', '', '', '', '', '', ''],
+        [`Total de Débitos:`, `=SOMA(F${dataStartRow}:F${dataEndRow})`, '', '', '', '', '', '', '', '', ''],
+        [`Total de Créditos:`, `=SOMA(G${dataStartRow}:G${dataEndRow})`, '', '', '', '', '', '', '', '', ''],
+        [`Saldo Final:`, `=G${formulaStartRow + 1}-F${formulaStartRow + 1}`, '', '', '', '', '', '', '', '', ''],
         [''],
-        ['TOTAIS CALCULADOS (Fórmulas Excel)'],
-        ['Total de Débitos:', `=SOMA(F${headerInfo.length + 1}:F${lastRow})`],
-        ['Total de Créditos:', `=SOMA(G${headerInfo.length + 1}:G${lastRow})`],
-        ['Saldo Final:', `=G${lastRow + 3}-F${lastRow + 3}`],
+        ['ANÁLISES AUXILIARES', '', '', '', '', '', '', '', '', '', ''],
+        [`Maior Débito:`, `=SE(CONT.VALORES(F${dataStartRow}:F${dataEndRow})>0;MÁXIMO(F${dataStartRow}:F${dataEndRow});0)`, '', '', '', '', '', '', '', '', ''],
+        [`Maior Crédito:`, `=SE(CONT.VALORES(G${dataStartRow}:G${dataEndRow})>0;MÁXIMO(G${dataStartRow}:G${dataEndRow});0)`, '', '', '', '', '', '', '', '', ''],
+        [`Média de Débitos:`, `=SE(CONT.VALORES(F${dataStartRow}:F${dataEndRow})>0;MÉDIA(F${dataStartRow}:F${dataEndRow});0)`, '', '', '', '', '', '', '', '', ''],
+        [`Média de Créditos:`, `=SE(CONT.VALORES(G${dataStartRow}:G${dataEndRow})>0;MÉDIA(G${dataStartRow}:G${dataEndRow});0)`, '', '', '', '', '', '', '', '', ''],
+        [`Qtd de Débitos:`, `=CONT.VALORES(F${dataStartRow}:F${dataEndRow})`, '', '', '', '', '', '', '', '', ''],
+        [`Qtd de Créditos:`, `=CONT.VALORES(G${dataStartRow}:G${dataEndRow})`, '', '', '', '', '', '', '', '', ''],
         [''],
-        ['ANÁLISES AUXILIARES'],
-        ['Maior Débito:', `=MÁXIMO(F${headerInfo.length + 1}:F${lastRow})`],
-        ['Maior Crédito:', `=MÁXIMO(G${headerInfo.length + 1}:G${lastRow})`],
-        ['Média de Débitos:', `=MÉDIA(F${headerInfo.length + 1}:F${lastRow})`],
-        ['Média de Créditos:', `=MÉDIA(G${headerInfo.length + 1}:G${lastRow})`],
-        ['Quantidade de Débitos:', `=CONT.VALORES(F${headerInfo.length + 1}:F${lastRow})`],
-        ['Quantidade de Créditos:', `=CONT.VALORES(G${headerInfo.length + 1}:G${lastRow})`],
-        [''],
-        ['CATEGORIAS MAIS UTILIZADAS'],
-        ['=ÚNICO(C${headerInfo.length + 1}:C${lastRow})']
+        ['INSTRUÇÕES PARA FORMATAÇÃO AUTOMÁTICA:', '', '', '', '', '', '', '', '', '', ''],
+        ['1. Selecione os dados da tabela (incluindo cabeçalhos)', '', '', '', '', '', '', '', '', '', ''],
+        ['2. Pressione Ctrl+T ou vá em Inserir > Tabela', '', '', '', '', '', '', '', '', '', ''],
+        ['3. Marque "Minha tabela tem cabeçalhos" e clique OK', '', '', '', '', '', '', '', '', '', ''],
+        ['4. Escolha um estilo de tabela no menu Design', '', '', '', '', '', '', '', '', '', '']
       ];
 
       // Combinar todos os dados
-      const finalData = [...headerInfo, ...movementRows, ...totalRows];
+      const finalData = [...headerInfo, ...movementRows, ...tableEnd, ...excelFormulas];
 
-      // Configuração especial para Excel
+      // Configuração especial para Excel com formatação de tabela
       const csv = Papa.unparse(finalData, {
         delimiter: ';', // Padrão brasileiro para Excel
-        header: false,  // Não adicionar cabeçalho automático pois já temos
-        quotes: true,   // Aspas em todos os campos para preservar formatação
+        header: false,  // Não adicionar cabeçalho automático
+        quotes: false,  // Sem aspas para melhor formatação
         quoteChar: '"',
         escapeChar: '"',
         skipEmptyLines: false
       });
 
-      // Adicionar BOM (Byte Order Mark) para UTF-8 e caracteres especiais
+      // Adicionar BOM (Byte Order Mark) para UTF-8
       const csvWithBOM = '\uFEFF' + csv;
 
       // Criar e baixar arquivo
@@ -173,7 +187,7 @@ const useDataExport = () => {
       // Limpar URL
       URL.revokeObjectURL(url);
 
-      return { success: true, message: 'Arquivo CSV otimizado para Excel exportado com sucesso!' };
+      return { success: true, message: 'Arquivo CSV formatado para tabela Excel exportado com sucesso!' };
     } catch (error) {
       console.error('Erro ao exportar CSV:', error);
       return { success: false, message: 'Erro ao exportar arquivo CSV para Excel' };
