@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Shield, Eye, EyeOff, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 
@@ -16,7 +16,34 @@ export default function AdminSetup() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [checkingSetup, setCheckingSetup] = useState(true);
   const router = useRouter();
+
+  // Verificar se precisa fazer setup inicial
+  useEffect(() => {
+    const checkSetup = async () => {
+      try {
+        const response = await fetch('/api/admin/auth/setup-status');
+        if (response.ok) {
+          const data = await response.json();
+          if (!data.needsSetup) {
+            // Se já foi configurado, redirecionar para login
+            router.push('/admin/login');
+            return;
+          }
+        } else {
+          setError('Erro ao verificar status do sistema');
+        }
+      } catch (error) {
+        console.error('Failed to check setup status:', error);
+        setError('Erro de conectividade ao verificar sistema');
+      } finally {
+        setCheckingSetup(false);
+      }
+    };
+
+    checkSetup();
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -86,7 +113,7 @@ export default function AdminSetup() {
       if (response.ok) {
         setSuccess(true);
         setTimeout(() => {
-          router.push('/admin');
+          router.push('/admin/login');
         }, 2000);
       } else {
         setError(data.error || 'Erro ao configurar sistema');
@@ -97,6 +124,23 @@ export default function AdminSetup() {
       setIsLoading(false);
     }
   };
+
+  if (checkingSetup) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow-xl sm:rounded-lg sm:px-10 border border-gray-200 dark:border-gray-700">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                Verificando status do sistema...
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (success) {
     return (
@@ -109,7 +153,7 @@ export default function AdminSetup() {
                 Sistema Configurado!
               </h3>
               <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                Primeiro administrador criado com sucesso. Redirecionando para o painel...
+                Primeiro administrador criado com sucesso. Redirecionando para o login...
               </p>
               <div className="mt-4">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto"></div>
