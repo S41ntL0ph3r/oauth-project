@@ -7,6 +7,7 @@ export async function GET() {
     
     return NextResponse.json({
       hasAdmins: adminCount > 0,
+      needsSetup: adminCount === 0,
       count: adminCount
     });
 
