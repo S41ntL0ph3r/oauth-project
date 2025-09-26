@@ -81,3 +81,74 @@ model Authenticator {
 
   @@id([userId, credentialID])
 }
+
+// Admin Panel Models
+model Admin {
+  id           String      @id @default(cuid())
+  email        String      @unique
+  password     String
+  name         String
+  role         AdminRole   @default(ADMIN)
+  status       AdminStatus @default(ACTIVE)
+  avatar       String?
+  lastLogin    DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  createdById  String?
+  createdBy    Admin?      @relation("AdminCreator", fields: [createdById], references: [id])
+  createdAdmins Admin[]    @relation("AdminCreator")
+  logs         AdminLog[]
+  products     Product[]
+
+  @@map("admins")
+}
+
+model Product {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  stock       Int           @default(0)
+  category    String
+  images      String[]      @default([])
+  status      ProductStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  createdById String
+  createdBy   Admin         @relation(fields: [createdById], references: [id])
+
+  @@map("products")
+}
+
+model AdminLog {
+  id        String     @id @default(cuid())
+  adminId   String
+  action    String
+  target    String?    // ID do item afetado
+  targetType String?   // user, product, admin, etc.
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime   @default(now())
+  admin     Admin      @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@map("admin_logs")
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+enum AdminStatus {
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+}
