@@ -8,6 +8,8 @@ jspm_packages/
 .env.production
 .env.development
 .env.test
+.env.*
+*.env
 
 # Next.js build outputs
 .next/
@@ -21,12 +23,46 @@ out/
 /prisma/dev.db
 /prisma/data/
 dev.db
+database.db
+*.db-journal
+*.db-wal
+*.db-shm
 
 # User uploads (SENSÍVEL)
 /public/uploads/
 /uploads/
 public/uploads/avatars/*
 !public/uploads/avatars/.gitkeep
+/public/files/
+/public/documents/
+/public/temp/
+
+# OAuth e Auth dados sensíveis
+/config/oauth.json
+/config/auth.json
+/src/config/oauth-secrets.*
+/lib/oauth-config.*
+oauth-credentials.*
+auth-secrets.*
+client-secrets.*
+service-account-key.json
+google-credentials.json
+github-app-key.pem
+
+# API Keys e Tokens (SENSÍVEL)
+api-keys.json
+tokens.json
+secrets.json
+credentials.json
+/config/keys/
+/config/secrets/
+*.private
+*.secret
+
+# Session stores (SENSÍVEL)
+/sessions/
+session-store/
+*.session
 
 # Logs (podem conter informações sensíveis)
 *.log
@@ -36,9 +72,31 @@ yarn-error.log*
 lerna-debug.log*
 .npm
 logs/
+/logs/
+pnpm-debug.log*
+
+# Email configurações sensíveis (SENSÍVEL)
+/src/lib/internal/emailjs-config.tsx
+/lib/email-config.*
+/config/email.*
+smtp-config.*
+mail-secrets.*
 
 # Prisma
 /src/generated/prisma
+prisma/migrations/*.sql.bak
+
+# Cache directories
+.cache
+.parcel-cache
+.eslintcache
+.stylelintcache
+.npm
+.pnpm-store
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
 
 # IDE and Editor files
 .vscode/
@@ -46,6 +104,11 @@ logs/
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
 
 # OS generated files
 .DS_Store
@@ -55,6 +118,8 @@ logs/
 .Trashes
 ehthumbs.db
 Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
 
 # Runtime data
 pids
@@ -67,38 +132,104 @@ coverage/
 *.lcov
 .nyc_output
 
-# Optional npm cache directory
-.eslintcache
-
 # Yarn Integrity file
 .yarn-integrity
-
-# parcel-bundler cache
-.cache
-.parcel-cache
-
-# Stores VSCode versions used for testing VSCode extensions
-.vscode-test
 
 # Temporary folders
 tmp/
 temp/
-
-# Email templates internos (SENSÍVEL)
-/src/lib/internal/emailjs-config.tsx
+.tmp/
+.temp/
 
 # Scripts de limpeza que podem conter caminhos sensíveis
 cleanup-*.js
+setup-*.js
+migration-*.js
 
-# Certificados e chaves (caso existam)
+# Certificados e chaves (SENSÍVEL)
 *.pem
 *.key
 *.crt
 *.csr
+*.p12
+*.pfx
 /certs/
+/ssl/
+/certificates/
+private-key.*
+public-key.*
 
-# Backup files
+# Backup files (podem conter dados sensíveis)
 *.bak
 *.backup
+*.old
+*.orig
+*.rej
+backup/
+backups/
 
+# Deployment
 .vercel
+.netlify
+.firebase
+.serverless
+.aws-sam/
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+.docker/
+
+# Testing
+.nyc_output
+jest_coverage/
+coverage/
+test-results/
+playwright-report/
+test-results/
+
+# Sentry Config File
+.sentryclirc
+
+# TypeScript incremental compilation
+*.tsbuildinfo
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn v2
+.pnp.*
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# User-specific files (podem conter informações pessoais)
+.user
+user-config.*
+personal-notes.*
+todo.txt
+notes.md
+/docs/private/
+
+# Dados de desenvolvimento local (SENSÍVEL)
+local-config.*
+dev-secrets.*
+test-data/
+sample-data/
+mock-data/
+
+# Arquivos de configuração específicos do usuário
+.npmrc
+.yarnrc
+.gitconfig.local
+
+# Monorepo
+lerna-debug.log*
+.rush/
+
+# Storybook
+storybook-static/
