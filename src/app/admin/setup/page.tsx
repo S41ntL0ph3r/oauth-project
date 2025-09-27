@@ -74,7 +74,13 @@ export default function AdminSetup() {
       return false;
     }
 
-    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(formData.password)) {
+    // Regex mais flexível para caracteres especiais
+    const hasLowerCase = /[a-z]/.test(formData.password);
+    const hasUpperCase = /[A-Z]/.test(formData.password);
+    const hasNumber = /\d/.test(formData.password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(formData.password);
+
+    if (!hasLowerCase || !hasUpperCase || !hasNumber || !hasSpecialChar) {
       setError('Senha deve conter pelo menos: 1 minúscula, 1 maiúscula, 1 número e 1 caractere especial');
       return false;
     }
