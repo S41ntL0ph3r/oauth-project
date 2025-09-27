@@ -46,8 +46,14 @@ export function isValidEmail(email: string): boolean {
  */
 export function isStrongPassword(password: string): boolean {
   // Pelo menos 8 caracteres, 1 maiúscula, 1 minúscula, 1 número, 1 caractere especial
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  return passwordRegex.test(password);
+  if (password.length < 8) return false;
+  
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasNumber = /\d/.test(password);
+  const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password);
+  
+  return hasLowerCase && hasUpperCase && hasNumber && hasSpecialChar;
 }
 
 /**
