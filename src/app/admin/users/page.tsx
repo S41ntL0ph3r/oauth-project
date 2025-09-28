@@ -121,7 +121,7 @@ export default function UsersManagement() {
       } else {
         setMessage({ type: 'error', text: data.error || 'Erro ao atualizar usuário' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Erro de conectividade' });
     } finally {
       setActionLoading(false);
@@ -147,7 +147,7 @@ export default function UsersManagement() {
       } else {
         setMessage({ type: 'error', text: data.error || 'Erro ao excluir usuário' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Erro de conectividade' });
     } finally {
       setActionLoading(false);
@@ -174,7 +174,7 @@ export default function UsersManagement() {
       } else {
         setMessage({ type: 'error', text: data.error || 'Erro ao solicitar reset' });
       }
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Erro de conectividade' });
     } finally {
       setActionLoading(false);
