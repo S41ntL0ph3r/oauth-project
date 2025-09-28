@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Image from 'next/image';
 import { 
   Search, 
   Edit3, 
@@ -356,10 +357,12 @@ export default function UsersManagement() {
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10">
                             {user.image ? (
-                              <img 
+                              <Image 
                                 className="h-10 w-10 rounded-full" 
                                 src={user.image} 
                                 alt={user.name || 'Avatar'} 
+                                width={40}
+                                height={40}
                               />
                             ) : (
                               <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
@@ -406,9 +409,13 @@ export default function UsersManagement() {
                             </span>
                           )}
                           {user.emailVerified ? (
-                            <UserCheck className="w-4 h-4 text-green-500" title="Email verificado" />
+                            <div title="Email verificado">
+                              <UserCheck className="w-4 h-4 text-green-500" />
+                            </div>
                           ) : (
-                            <UserX className="w-4 h-4 text-red-500" title="Email não verificado" />
+                            <div title="Email não verificado">
+                              <UserX className="w-4 h-4 text-red-500" />
+                            </div>
                           )}
                         </div>
                       </td>
@@ -746,10 +753,12 @@ function UserDetailsModal({ user, onClose }: {
             {/* Avatar e Info Básica */}
             <div className="flex items-center space-x-4">
               {user.image ? (
-                <img 
+                <Image 
                   className="h-20 w-20 rounded-full" 
                   src={user.image} 
                   alt={user.name || 'Avatar'} 
+                  width={80}
+                  height={80}
                 />
               ) : (
                 <div className="h-20 w-20 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
