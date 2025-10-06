@@ -91,8 +91,12 @@ export async function getAuthenticatedAdmin(): Promise<AdminJWTPayload | null> {
  */
 export function getAuthenticatedAdminFromRequest(request: NextRequest): AdminJWTPayload | null {
   const token = getAdminTokenFromRequest(request);
+  console.log('Token from request:', token ? 'Found' : 'Not found');
   if (!token) return null;
-  return verifyAdminToken(token);
+  
+  const result = verifyAdminToken(token);
+  console.log('Token verification result:', result ? 'Valid' : 'Invalid');
+  return result;
 }
 
 /**
@@ -106,7 +110,7 @@ export function createSecureCookie(token: string) {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax' as const,
     maxAge: 24 * 60 * 60, // 24 horas em segundos
-    path: '/admin'
+    path: '/' // Alterar para root path para funcionar em todo o site
   };
 }
 
@@ -121,7 +125,7 @@ export function createLogoutCookie() {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax' as const,
     maxAge: 0,
-    path: '/admin'
+    path: '/' // Alterar para root path
   };
 }
 
