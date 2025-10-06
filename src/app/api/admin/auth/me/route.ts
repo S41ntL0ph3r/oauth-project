@@ -4,9 +4,12 @@ import { getAuthenticatedAdminFromRequest } from '@/lib/admin/jwt';
 
 export async function GET(request: NextRequest) {
   try {
+    console.log('Admin /me called');
     const admin = getAuthenticatedAdminFromRequest(request);
+    console.log('Admin from token:', admin);
     
     if (!admin) {
+      console.log('No admin found in token');
       return NextResponse.json(
         { error: 'Não autenticado' },
         { status: 401 }
@@ -28,7 +31,10 @@ export async function GET(request: NextRequest) {
       }
     });
 
+    console.log('Admin data from DB:', adminData);
+
     if (!adminData || adminData.status !== 'ACTIVE') {
+      console.log('Admin not found or inactive');
       return NextResponse.json(
         { error: 'Admin não encontrado ou inativo' },
         { status: 404 }
