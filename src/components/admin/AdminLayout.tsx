@@ -80,7 +80,7 @@ const sidebarItems = [
   },
   { 
     name: 'Configurações', 
-    href: '/admin/settings', 
+    href: '/admin/configurations', 
     icon: Settings, 
     roles: ['SUPER_ADMIN', 'ADMIN'] 
   }

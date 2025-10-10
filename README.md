@@ -173,7 +173,32 @@ npm run type-check   # Verificação TypeScript
 
 ---
 
-## 📈 **Roadmap Futuro**
+## � **Deploy no Vercel**
+
+### **Configuração Rápida:**
+
+1. **Conecte ao GitHub** e configure variáveis no Vercel:
+```bash
+AUTH_SECRET="sua-chave-super-secreta-64-caracteres"
+ADMIN_JWT_SECRET="chave-admin-diferente-64-caracteres"
+DATABASE_URL="postgresql://user:pass@host:5432/db?sslmode=require"
+AUTH_GITHUB_ID="seu-github-oauth-id"
+AUTH_GITHUB_SECRET="seu-github-oauth-secret"
+NEXTAUTH_URL="https://seu-dominio.vercel.app"
+```
+
+2. **Configure GitHub OAuth:**
+   - Callback URL: `https://seu-dominio.vercel.app/api/auth/callback/github`
+
+3. **Acesse `/admin/setup`** para criar o primeiro administrador
+
+### **Banco de Dados Recomendado:**
+- **Neon**: https://neon.tech (PostgreSQL grátis)
+- **PlanetScale**: https://planetscale.com (MySQL grátis)
+
+---
+
+## �📈 **Roadmap Futuro**
 
 - [ ] 📊 **Gráficos e relatórios** avançados
 - [ ] 💾 **Exportação de dados** (CSV/PDF)
