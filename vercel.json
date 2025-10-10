@@ -1,7 +1,10 @@
 {
   "functions": {
     "app/api/**/*.ts": {
-      "maxDuration": 10
+      "maxDuration": 30
+    },
+    "app/api/admin/**/*.ts": {
+      "maxDuration": 30
     }
   },
   "regions": ["cle1"],
@@ -9,5 +12,47 @@
     "env": {
       "NEXT_TELEMETRY_DISABLED": "1"
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/admin/(.*)",
+      "headers": [
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/api/admin/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/admin/dashboard"
+    }
+  ]
 }
