@@ -19,7 +19,7 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
     "@emailjs/browser": "^4.4.1",
-    "@prisma/client": "^6.14.0",
+    "@prisma/client": "6.16.3",
     "@radix-ui/react-slot": "^1.2.3",
     "@types/bcrypt": "^6.0.0",
     "@types/bcryptjs": "^2.4.6",
@@ -36,7 +36,7 @@
     "lucide-react": "^0.469.0",
     "next": "^15.4.7",
     "next-auth": "^5.0.0-beta.25",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^7.0.12",
     "papaparse": "^5.5.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -48,14 +48,14 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@types/node": "^20.19.11",
-    "@types/nodemailer": "^7.0.0",
+    "@types/nodemailer": "^7.0.4",
     "@types/papaparse": "^5.3.16",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "eslint": "^9.33.0",
     "eslint-config-next": "^15.1.3",
     "postcss": "^8.5.6",
-    "prisma": "^6.14.0",
+    "prisma": "6.16.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.9.2"
   }
