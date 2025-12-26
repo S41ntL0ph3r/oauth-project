@@ -28,6 +28,14 @@ database.db
 *.db-wal
 *.db-shm
 
+# Documentation files (temporary/local)
+DEPLOY_CHECKLIST.md
+VERCEL_DEPLOY.md
+SECURITY_REPORT.md
+SECURITY_ACTION_PLAN.md
+*_CHECKLIST.md
+*_DEPLOY.md
+
 # User uploads (SENSÍVEL)
 /public/uploads/
 /uploads/
