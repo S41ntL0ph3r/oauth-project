@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcrypt";
+import { createHash } from "crypto";
 import db from "@/lib/db";
 
 export async function POST(request: NextRequest) {
@@ -13,16 +14,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (password.length < 6) {
+    // SEGURANÇA: Aumentar requisitos de senha
+    if (password.length < 12) {
       return NextResponse.json(
-        { error: "A senha deve ter pelo menos 6 caracteres" },
+        { error: "A senha deve ter pelo menos 12 caracteres" },
+        { status: 400 }
+      );
+    }
+    
+    // Validar complexidade da senha
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password);
+    
+    if (!hasLowerCase || !hasUpperCase || !hasNumber || !hasSpecialChar) {
+      return NextResponse.json(
+        { error: "A senha deve conter pelo menos: 1 letra maiúscula, 1 minúscula, 1 número e 1 caractere especial" },
         { status: 400 }
       );
     }
 
-    // Verificar se o token é válido
+    // SEGURANÇA: Hashear token recebido para comparar com o hash no banco
+    const tokenHash = createHash('sha256').update(token).digest('hex');
+
+    // Verificar se o token é válido (usando o hash)
     const resetToken = await db.passwordResetToken.findUnique({
-      where: { token },
+      where: { token: tokenHash },
     });
 
     if (!resetToken) {
@@ -71,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     // Marcar o token como usado
     await db.passwordResetToken.update({
-      where: { token },
+      where: { token: tokenHash },
       data: { used: true },
     });
 
