@@ -8,17 +8,20 @@ datasource db {
 }
 
 model User {
-  id               String          @id @default(cuid())
-  name             String?
-  email            String?         @unique
-  password         String?
-  emailVerified    DateTime?
-  image            String?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  accounts         Account[]
-  Authenticator    Authenticator[]
-  sessions         Session[]
+  id            String          @id @default(cuid())
+  name          String?
+  email         String?         @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  accounts      Account[]
+  Authenticator Authenticator[]
+  sessions      Session[]
+  consents      UserConsent[]
+  accessLogs    DataAccessLog[]
+  dataRequests  DataRequest[]
 }
 
 model Account {
@@ -82,73 +85,86 @@ model Authenticator {
   @@id([userId, credentialID])
 }
 
-// Admin Panel Models
-model Admin {
-  id           String      @id @default(cuid())
-  email        String      @unique
-  password     String
-  name         String
-  role         AdminRole   @default(ADMIN)
-  status       AdminStatus @default(ACTIVE)
-  avatar       String?
-  lastLogin    DateTime?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  createdById  String?
-  createdBy    Admin?      @relation("AdminCreator", fields: [createdById], references: [id])
-  createdAdmins Admin[]    @relation("AdminCreator")
-  logs         AdminLog[]
-  products     Product[]
+// LGPD/GDPR: Registro de Consentimento
+model UserConsent {
+  id               String   @id @default(cuid())
+  userId           String
+  consentType      ConsentType
+  purpose          String   // Finalidade do tratamento
+  granted          Boolean  @default(false)
+  grantedAt        DateTime?
+  revokedAt        DateTime?
+  ipAddress        String?
+  userAgent        String?
+  version          String   @default("1.0") // Versão da política
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("admins")
+  @@index([userId, consentType])
+  @@map("user_consents")
 }
 
-model Product {
+// LGPD/GDPR: Logs de Auditoria de Acesso a Dados
+model DataAccessLog {
+  id          String   @id @default(cuid())
+  userId      String?  // Usuário cujos dados foram acessados
+  accessedBy  String   // Admin/User que acessou
+  accessType  String   // read, update, delete, export
+  dataType    String   // profile, email, password, etc
+  reason      String?  // Justificativa do acesso
+  ipAddress   String?
+  userAgent   String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([accessedBy, createdAt])
+  @@map("data_access_logs")
+}
+
+// LGPD/GDPR: Solicitações de Dados
+model DataRequest {
   id          String        @id @default(cuid())
-  name        String
-  description String?
-  price       Float
-  stock       Int           @default(0)
-  category    String
-  images      String[]      @default([])
-  status      ProductStatus @default(ACTIVE)
+  userId      String
+  requestType RequestType
+  status      RequestStatus @default(PENDING)
+  requestedAt DateTime      @default(now())
+  completedAt DateTime?
+  data        Json?         // Dados exportados/anonimizados
+  notes       String?
+  processedBy String?       // Admin que processou
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
-  createdById String
-  createdBy   Admin         @relation(fields: [createdById], references: [id])
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("products")
+  @@index([userId, status])
+  @@map("data_requests")
 }
 
-model AdminLog {
-  id        String     @id @default(cuid())
-  adminId   String
-  action    String
-  target    String?    // ID do item afetado
-  targetType String?   // user, product, admin, etc.
-  details   Json?
-  ipAddress String?
-  userAgent String?
-  createdAt DateTime   @default(now())
-  admin     Admin      @relation(fields: [adminId], references: [id], onDelete: Cascade)
-
-  @@map("admin_logs")
+enum ConsentType {
+  TERMS_OF_SERVICE
+  PRIVACY_POLICY
+  MARKETING_EMAILS
+  DATA_PROCESSING
+  COOKIES
+  ANALYTICS
+  THIRD_PARTY_SHARING
 }
 
-enum AdminRole {
-  SUPER_ADMIN
-  ADMIN
-  EDITOR
+enum RequestType {
+  DATA_EXPORT      // Art. 18, II LGPD - Portabilidade
+  DATA_CORRECTION  // Art. 18, III LGPD - Correção
+  DATA_DELETION    // Art. 18, VI LGPD - Eliminação
+  DATA_ANONYMIZATION // Art. 16 LGPD - Anonimização
+  ACCESS_INFO      // Art. 18, I LGPD - Confirmação de tratamento
 }
 
-enum AdminStatus {
-  ACTIVE
-  SUSPENDED
-  INACTIVE
-}
-
-enum ProductStatus {
-  ACTIVE
-  INACTIVE
-  OUT_OF_STOCK
+enum RequestStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+  CANCELLED
 }

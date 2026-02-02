@@ -1,17 +1,17 @@
-# 🔐 Sistema de Autenticação Moderno com Next.js
+# 🔐 Sistema de Autenticação Moderno com Painel Admin
 
 <div align="center">
 
-![Next.js](https://img.shields.io/badge/Next.js-15.4.7-black?style=for-the-badge&logo=next.js)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)
-![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)
+![Next.js](https://img.shields.io/badge/Next.js-15.5.9-black?style=for-the-badge&logo=next.js)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?style=for-the-badge&logo=typescript)
+![Prisma](https://img.shields.io/badge/Prisma-6.16.3-2D3748?style=for-the-badge&logo=prisma)
 ![NextAuth](https://img.shields.io/badge/NextAuth-v5-purple?style=for-the-badge)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
-![EmailJS](https://img.shields.io/badge/EmailJS-Service-orange?style=for-the-badge)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?style=for-the-badge&logo=postgresql)
 
-*Uma plataforma completa de autenticação com recuperação de senha e verificação de email*
+*Plataforma completa de autenticação com painel administrativo profissional*
 
-[Recursos](#-recursos-principais) • [Instalação](#-instalação) • [Tecnologias](#-tecnologias) • [Contribuição](#-contribuição)
+[Recursos](#-recursos-principais) • [Admin Panel](#-painel-administrativo) • [Instalação](#-instalação) • [Deploy](#-deploy-no-vercel)
 
 </div>
 
@@ -19,12 +19,13 @@
 
 ## 🎯 **Sobre o Projeto**
 
-Este é um **sistema de autenticação robusto e moderno**, construído com as melhores práticas de segurança e experiência do usuário. O projeto oferece uma base sólida para aplicações que precisam de autenticação segura, recuperação de senha e gerenciamento de perfil de usuário.
+Sistema de **autenticação completo e moderno** com painel administrativo profissional. Construído com as melhores práticas de segurança, oferece gestão completa de usuários, produtos e logs de atividade.
 
 ### ✨ **Diferenciais do Sistema**
 - 🔐 **Autenticação Híbrida** - OAuth (GitHub) + Credenciais locais
-- 📧 **Sistema de Email Completo** - Verificação e recuperação via EmailJS
-- �️ **Segurança Avançada** - Hash bcrypt, tokens seguros, sessões JWT
+- �️ **Painel Admin Completo** - Gestão de usuários, produtos e permissões
+- �📧 **Sistema de Email** - Verificação e recuperação via EmailJS
+- 🔒 **Segurança Avançada** - JWT, bcrypt, rate limiting, XSS protection
 - 🎨 **Interface Moderna** - Design responsivo com modo escuro/claro
 - ⚡ **Performance Otimizada** - Next.js 15 App Router com TypeScript
 
@@ -32,54 +33,102 @@ Este é um **sistema de autenticação robusto e moderno**, construído com as m
 
 ## 🌟 **Recursos Principais**
 
-### � **Sistema de Autenticação Completo**
-- � **Login OAuth com GitHub** - Integração nativa e segura
-- � **Registro com credenciais** - Email e senha com validação
-- ✅ **Verificação de email obrigatória** - Links seguros via EmailJS
-- � **Sessões JWT persistentes** - NextAuth v5 com Prisma
+### 👤 **Autenticação de Usuários**
+- 🔑 **Login OAuth com GitHub** - Integração nativa e segura
+- 📝 **Registro com credenciais** - Email e senha com validação
+- ✅ **Verificação de email** - Links seguros via EmailJS
+- 🔐 **Sessões JWT persistentes** - NextAuth v5 com Prisma
+- � **Recuperação de senha** - Tokens temporários seguros
 
-### 🛡️ **Recuperação de Senha Segura**
-- � **Envio automático de emails** - Sistema EmailJS integrado
-- � **Tokens únicos temporários** - Expiração automática em 24h
-- � **Hash seguro de senhas** - bcrypt com 12 rounds
-- ✨ **Interface intuitiva** - Formulários responsivos e acessíveis
+### 🛡️ **Painel Administrativo**
+- 👥 **Gestão de Usuários** - CRUD completo com busca e filtros
+- 🛍️ **Gestão de Produtos** - Cadastro, estoque, categorias e imagens
+- 👨‍💼 **Gestão de Admins** - Controle de permissões (SUPER_ADMIN, ADMIN, EDITOR)
+- 📊 **Dashboard com Métricas** - Gráficos e estatísticas em tempo real
+- 📋 **Logs de Atividade** - Rastreamento completo de ações administrativas
+- ⚙️ **Configurações** - Email, segurança, aparência e sistema
+- 🔒 **Autenticação JWT** - Cookies HTTP-only seguros
 
-### � **Gerenciamento de Perfil**
-- �️ **Upload de avatar** - Imagens locais com redimensionamento
-- ✏️ **Edição de dados pessoais** - Nome, email e informações
-- � **Alteração de senha** - Modal seguro com validação
+### 👤 **Gerenciamento de Perfil**
+- 🖼️ **Upload de avatar** - Imagens locais com otimização
+- ✏️ **Edição de dados** - Nome, email e informações pessoais
+- 🔑 **Alteração de senha** - Modal seguro com validação forte
 - 🗑️ **Reset de avatar** - Voltar ao avatar padrão
 
 ### 🎨 **Experiência do Usuário**
 - 🌙 **Modo escuro/claro** - Preferência salva localmente
-- 📱 **Design totalmente responsivo** - Mobile-first
+- 📱 **Design responsivo** - Mobile-first approach
 - ⚡ **Cache inteligente** - Service Worker para performance
-- 🔔 **Feedbacks visuais** - Estados de carregamento e sucesso
-- 🎯 **Interface intuitiva** e acessível
+- 🔔 **Feedbacks visuais** - Loading states e notificações
+- ♿ **Acessibilidade** - Interface WCAG compliant
 
 ---
 
-## 🚀 **Demonstração**
+## 🔐 **Painel Administrativo**
 
-### 📱 **Interface Principal**
-```
-🏠 Dashboard
-├── 💰 Saldo Atual (cálculo automático)
-├── 📊 Resumo Financeiro  
-├── 📋 Últimas Atividades
-└── 🔍 Visão Geral
+### **Funcionalidades Admin:**
 
-💳 Transações
-├── ➕ Adicionar Receita/Despesa
-├── 🏷️ Categorização Automática
-└── 📅 Filtros por Data
+#### 📊 **Dashboard**
+- Métricas em tempo real (usuários, produtos, admins)
+- Gráficos de atividade com Recharts
+- Logs recentes de ações administrativas
+- Cards com estatísticas rápidas
 
-⏰ Pagamentos
-├── 📅 Agendar Novos Pagamentos
-├── ✏️ Editar Pagamentos Existentes
-├── 🔄 Alterar Status (Pendente/Pago/Vencido)
-└── ⚠️ Alertas de Vencimento
-```
+#### 👥 **Gestão de Usuários**
+- Listagem completa com paginação
+- Busca por nome/email
+- Filtros por status e data
+- Ações: Editar, Suspender, Excluir
+- Reset de senha administrativo
+- Visualização de perfil completo
+
+#### 🛍️ **Gestão de Produtos**
+- CRUD completo de produtos
+- Upload múltiplo de imagens
+- Controle de estoque
+- Categorização
+- Status (Ativo, Inativo, Sem Estoque)
+- Filtros avançados
+
+#### 👨‍💼 **Gestão de Administradores**
+- Criação de novos admins
+- Controle de permissões por role
+- Status: Ativo, Suspenso, Inativo
+- Último login registrado
+- Hierarquia de permissões
+
+#### 📋 **Logs de Atividade**
+- Registro de todas as ações admin
+- Filtros por tipo de ação
+- IP e User Agent tracking
+- Exportação de dados
+- Detalhes completos de cada ação
+
+#### ⚙️ **Configurações**
+- Configurações gerais do site
+- Setup de email (SMTP)
+- Segurança e autenticação
+- Aparência e temas
+- Notificações
+
+### **Permissões de Acesso:**
+- 🔴 **SUPER_ADMIN**: Acesso total ao sistema
+- 🟡 **ADMIN**: Gestão de usuários e produtos
+- 🟢 **EDITOR**: Apenas gestão de produtos
+
+---
+
+## 🚀 **URLs do Projeto**
+
+### **Aplicação Principal:**
+- **Homepage**: https://oauth-project-s41ntl0ph3r.vercel.app
+- **Login**: https://oauth-project-s41ntl0ph3r.vercel.app/sign-in
+- **Registro**: https://oauth-project-s41ntl0ph3r.vercel.app/sign-up
+
+### **Painel Administrativo:**
+- **Admin Login**: https://oauth-project-s41ntl0ph3r.vercel.app/admin/login
+- **Setup Inicial**: https://oauth-project-s41ntl0ph3r.vercel.app/admin/setup
+- **Dashboard**: https://oauth-project-s41ntl0ph3r.vercel.app/admin
 
 ---
 
@@ -89,6 +138,14 @@ Este é um **sistema de autenticação robusto e moderno**, construído com as m
 - Node.js 18+ 
 - npm ou yarn
 - Git
+- PostgreSQL (ou conta no Neon/PlanetScale)
+
+### **Passo a passo**
+
+```bash
+# Clone o repositório
+git clone https://github.com/S41ntL0ph3r/oauth-project.git
+cd oauth-project
 
 ### **Passo a passo**
 
@@ -105,7 +162,7 @@ cp .env.example .env.local
 # Edite o .env.local com suas configurações
 
 # Execute as migrações do banco
-npx prisma migrate dev
+npx prisma db push
 
 # Inicie o servidor de desenvolvimento
 npm run dev
@@ -119,27 +176,72 @@ npm run dev
    - **Callback URL:** `http://localhost:3000/api/auth/callback/github`
 4. Adicione as credenciais no `.env.local`
 
+### **Variáveis de Ambiente Obrigatórias**
+```env
+# Autenticação
+AUTH_SECRET="sua-chave-secreta-64-caracteres"
+ADMIN_JWT_SECRET="chave-admin-diferente-64-caracteres"
+
+# Banco de Dados
+DATABASE_URL="postgresql://user:pass@host:5432/db"
+
+# GitHub OAuth
+AUTH_GITHUB_ID="seu-github-client-id"
+AUTH_GITHUB_SECRET="seu-github-client-secret"
+
+# URL Base
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+---
+
+## 🚀 **Deploy no Vercel**
+
+### **Configuração Rápida:**
+
+1. **Conecte ao GitHub** e configure variáveis no Vercel:
+```bash
+AUTH_SECRET="sua-chave-super-secreta-64-caracteres"
+ADMIN_JWT_SECRET="chave-admin-diferente-64-caracteres"
+DATABASE_URL="postgresql://user:pass@host:5432/db?sslmode=require"
+AUTH_GITHUB_ID="seu-github-oauth-id"
+AUTH_GITHUB_SECRET="seu-github-oauth-secret"
+NEXTAUTH_URL="https://seu-dominio.vercel.app"
+```
+
+2. **Configure GitHub OAuth:**
+   - Callback URL: `https://seu-dominio.vercel.app/api/auth/callback/github`
+
+3. **Acesse `/admin/setup`** para criar o primeiro administrador
+
+### **Banco de Dados Recomendado:**
+- **Neon**: https://neon.tech (PostgreSQL grátis)
+- **PlanetScale**: https://planetscale.com (MySQL grátis)
+
 ---
 
 ## 🔧 **Tecnologias**
 
 ### **Frontend**
-- **Next.js 15** - Framework React com App Router
-- **TypeScript** - Tipagem estática para maior segurança
-- **Tailwind CSS** - Estilização moderna e responsiva
-- **React Hooks** - Estado e efeitos otimizados
+- **Next.js 15.5.9** - Framework React com App Router
+- **TypeScript 5.9** - Tipagem estática
+- **Tailwind CSS** - Estilização responsiva
+- **Lucide React** - Ícones modernos
+- **Recharts** - Gráficos e dashboards
 
 ### **Backend**
-- **NextAuth v5** - Autenticação completa e segura
-- **Prisma ORM** - Banco de dados type-safe
-- **SQLite** - Banco local para desenvolvimento
-- **bcrypt** - Hash seguro de senhas
+- **NextAuth v5** - Autenticação completa
+- **Prisma 6.16.3** - ORM type-safe
+- **PostgreSQL** - Banco de dados em produção
+- **bcryptjs** - Hash de senhas (12 rounds)
+- **jsonwebtoken** - JWT para admin panel
 
-### **Experiência do Usuário**
-- **Context API** - Gerenciamento de estado global
-- **localStorage** - Persistência de preferências
-- **Modais dinâmicos** - Interações intuitivas
-- **Validação em tempo real** - Feedback imediato
+### **Segurança**
+- **HTTP-only cookies** - Tokens seguros
+- **Rate limiting** - Proteção contra brute force
+- **XSS protection** - Headers de segurança
+- **Input validation** - Sanitização de dados
+- **Role-based access** - Controle de permissões
 
 ---
 
@@ -148,6 +250,21 @@ npm run dev
 ```
 oauth-project/
 ├── 📁 src/
+│   ├── 📁 app/
+│   │   ├── 📁 (auth)/          # Páginas de autenticação
+│   │   ├── 📁 (protected)/     # Páginas protegidas (usuários)
+│   │   ├── 📁 admin/           # Painel administrativo
+│   │   └── 📁 api/             # Rotas da API
+│   ├── 📁 components/          # Componentes reutilizáveis
+│   │   ├── 📁 admin/           # Componentes do admin
+│   │   └── 📁 ui/              # Componentes de UI
+│   ├── 📁 contexts/            # Contextos React
+│   ├── 📁 hooks/               # Custom hooks
+│   └── 📁 lib/                 # Utilitários e configurações
+│       └── 📁 admin/           # Utilitários do admin
+├── 📁 prisma/                  # Schema e migrações
+└── 📁 public/                  # Arquivos estáticos
+```
 │   ├── 📁 app/
 │   │   ├── 📁 (auth)/          # Páginas de autenticação
 │   │   ├── 📁 (protected)/     # Páginas protegidas

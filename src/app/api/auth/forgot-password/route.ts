@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { randomBytes } from "crypto";
+import { randomBytes, createHash } from "crypto";
 import db from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/emailjs";
 
@@ -43,21 +43,22 @@ export async function POST(request: NextRequest) {
       data: { used: true },
     });
 
-    // Gerar novo token
-    const token = randomBytes(32).toString("hex");
+    // SEGURANÇA: Gerar token e hashear antes de salvar
+    const rawToken = randomBytes(32).toString("hex");
+    const tokenHash = createHash('sha256').update(rawToken).digest('hex');
     const expires = new Date(Date.now() + 3600000); // 1 hora
 
-    // Salvar token no banco
+    // Salvar hash do token no banco (não o token em si)
     await db.passwordResetToken.create({
       data: {
         email: email.toLowerCase(),
-        token,
+        token: tokenHash, // Salvamos o hash, não o token original
         expires,
       },
     });
-
-    // Enviar email
-    await sendPasswordResetEmail(email, token);
+    
+    // Enviar o token original por email (não o hash)
+    await sendPasswordResetEmail(email, rawToken);
 
     return NextResponse.json({
       message: "Se este email estiver cadastrado, você receberá um link de redefinição",

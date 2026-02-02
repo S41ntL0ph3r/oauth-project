@@ -1,6 +1,19 @@
 import { NextResponse } from 'next/server';
+import { getAuthenticatedAdmin } from '@/lib/admin/jwt';
 
 export async function GET() {
+  // SEGURANÇA: Apenas disponível em desenvolvimento OU para admins autenticados
+  if (process.env.NODE_ENV === 'production') {
+    const admin = await getAuthenticatedAdmin();
+    
+    if (!admin || admin.role !== 'SUPER_ADMIN') {
+      return NextResponse.json(
+        { error: 'Not Found' },
+        { status: 404 }
+      );
+    }
+  }
+  
   const envVars = {
     AUTH_SECRET: process.env.AUTH_SECRET ? 'SET' : 'NOT_SET',
     AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID ? 'SET' : 'NOT_SET', 

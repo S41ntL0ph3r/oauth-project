@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-// import { auth } from '@/lib/auth';
+import { checkRateLimit, getClientIP } from '@/lib/admin/security';
 
 interface SendEmailRequest {
   type: 'reset' | 'verify';
@@ -9,8 +9,19 @@ interface SendEmailRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    // Verificar se o usuário está autenticado (opcional)
-    // const session = await auth();
+    // SEGURANÇA: Rate limiting rigoroso para prevenir spam
+    const clientIP = getClientIP(request);
+    const ipLimit = checkRateLimit(`email:ip:${clientIP}`, 5, 60 * 60 * 1000); // 5 por hora por IP
+    
+    if (!ipLimit.allowed) {
+      return NextResponse.json(
+        { 
+          error: 'Limite de envio de emails atingido. Tente novamente mais tarde.',
+          resetTime: ipLimit.resetTime 
+        },
+        { status: 429 }
+      );
+    }
     
     const { type, email, token }: SendEmailRequest = await request.json();
 

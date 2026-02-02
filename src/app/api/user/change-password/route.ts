@@ -23,9 +23,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (newPassword.length < 6) {
+    // SEGURANÇA: Aumentar requisitos de senha
+    if (newPassword.length < 12) {
       return NextResponse.json(
-        { error: "A nova senha deve ter pelo menos 6 caracteres" },
+        { error: "A nova senha deve ter pelo menos 12 caracteres" },
+        { status: 400 }
+      );
+    }
+    
+    // Validar complexidade da senha
+    const hasLowerCase = /[a-z]/.test(newPassword);
+    const hasUpperCase = /[A-Z]/.test(newPassword);
+    const hasNumber = /\d/.test(newPassword);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(newPassword);
+    
+    if (!hasLowerCase || !hasUpperCase || !hasNumber || !hasSpecialChar) {
+      return NextResponse.json(
+        { error: "A senha deve conter pelo menos: 1 letra maiúscula, 1 minúscula, 1 número e 1 caractere especial" },
         { status: 400 }
       );
     }
