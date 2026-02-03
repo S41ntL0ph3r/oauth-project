@@ -324,11 +324,11 @@ const DashboardClient: React.FC = () => {
   }, [prepareExportData, exportToCSV, generateUniqueId, setActivities]);
 
   // Função para exportar PDF
-  const handleExportPDF = useCallback(() => {
+  const handleExportPDF = useCallback(async () => {
     console.log('handleExportPDF chamado');
     const data = prepareExportData();
     console.log('Dados preparados:', data);
-    const result = exportToPDF(data);
+    const result = await exportToPDF(data);
     console.log('Resultado exportToPDF:', result);
     
     if (result.success) {
