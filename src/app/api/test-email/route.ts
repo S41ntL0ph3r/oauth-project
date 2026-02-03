@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthenticatedAdmin } from '@/lib/admin/jwt';
+import { auth } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
-    // SEGURANÇA: Apenas admins ou ambiente de desenvolvimento
+    // SEGURANÇA: Apenas usuários autenticados ou ambiente de desenvolvimento
     if (process.env.NODE_ENV === 'production') {
-      const admin = await getAuthenticatedAdmin();
+      const session = await auth();
       
-      if (!admin) {
+      if (!session?.user) {
         return NextResponse.json(
           { error: 'Não autorizado' },
           { status: 401 }
