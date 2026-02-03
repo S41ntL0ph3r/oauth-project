@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { getAuthenticatedAdmin } from '@/lib/admin/jwt';
+import { auth } from "@/lib/auth";
 
 export async function GET() {
-  // SEGURANÇA: Apenas disponível em desenvolvimento OU para admins autenticados
+  // SEGURANÇA: Apenas disponível em desenvolvimento OU para usuários autenticados
   if (process.env.NODE_ENV === 'production') {
-    const admin = await getAuthenticatedAdmin();
+    const session = await auth();
     
-    if (!admin || admin.role !== 'SUPER_ADMIN') {
+    if (!session?.user) {
       return NextResponse.json(
         { error: 'Not Found' },
         { status: 404 }
