@@ -4,9 +4,10 @@ import prisma from '@/lib/db';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await auth();
     if (!session?.user?.email) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -22,7 +23,7 @@ export async function DELETE(
 
     await prisma.customReport.delete({
       where: {
-        id: params.id,
+        id,
         userId: user.id
       }
     });
