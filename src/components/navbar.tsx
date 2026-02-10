@@ -14,10 +14,17 @@ const NavContainer = () => {
   const router = useRouter();
 
   const items: NavItem[] = [
-  { label: "Home", href: "/home" },
+    { label: "Home", href: "/home" },
     { label: "Dashboard", href: "/dashboard" },
+    { label: "Orçamento", href: "/budget" },
+    { label: "Relatórios", href: "/relatorios" },
+    { label: "Notificações", href: "/notificacoes" },
     { label: "Profile", href: "/profile" },
     { label: "Settings", href: "/settings" },
+    { label: "Analytics", href: "/analytics" },
+    { label: "Security", href: "/security" },
+    { label: "Backups", href: "/backups" },
+    { label: "Reports", href: "/reports" },
     {
       label: "Logout",
       onClick: async () => {

@@ -247,3 +247,16 @@ lerna-debug.log*
 
 # Storybook
 storybook-static/
+
+# Arquivos de documentação com informações sensíveis
+IMPLEMENTATION_SUMMARY.md
+NEW_FEATURES.md
+API_EXAMPLES.md
+EMAILJS_TEMPLATES.md
+setup-neon.md
+script.md
+SECURITY.md
+
+# Arquivos temporários do Windows
+*.tmp
+~$*

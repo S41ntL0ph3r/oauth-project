@@ -22,6 +22,8 @@ model User {
   consents      UserConsent[]
   accessLogs    DataAccessLog[]
   dataRequests  DataRequest[]
+  sessionLogs   SessionLog[]
+  securityEvents SecurityEvent[]
 }
 
 model Account {
@@ -167,4 +169,268 @@ enum RequestStatus {
   COMPLETED
   REJECTED
   CANCELLED
+}
+
+// Analytics: Métricas de uso do sistema
+model Analytics {
+  id            String   @id @default(cuid())
+  metric        String   // users_count, logins_count, etc
+  value         Float
+  metadata      Json?    // Dados adicionais
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  @@index([metric, date])
+  @@map("analytics")
+}
+
+// Logs de Sessão: Rastreamento completo de sessões
+model SessionLog {
+  id            String    @id @default(cuid())
+  userId        String
+  sessionToken  String?
+  action        String    // login, logout, session_refresh, password_change
+  ipAddress     String?
+  userAgent     String?
+  device        String?   // Tipo de dispositivo (mobile, desktop, tablet)
+  browser       String?   // Nome do navegador
+  os            String?   // Sistema operacional
+  country       String?   // País (via GeoIP)
+  city          String?   // Cidade (via GeoIP)
+  success       Boolean   @default(true)
+  failReason    String?   // Motivo de falha se success = false
+  duration      Int?      // Duração da sessão em segundos
+  metadata      Json?
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([ipAddress, createdAt])
+  @@map("session_logs")
+}
+
+// Eventos de Segurança: Alertas e atividades suspeitas
+model SecurityEvent {
+  id            String        @id @default(cuid())
+  userId        String?
+  eventType     SecurityEventType
+  severity      SecuritySeverity
+  description   String
+  ipAddress     String?
+  userAgent     String?
+  metadata      Json?
+  resolved      Boolean       @default(false)
+  resolvedAt    DateTime?
+  resolvedBy    String?
+  createdAt     DateTime      @default(now())
+  user          User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([eventType, severity])
+  @@index([resolved])
+  @@map("security_events")
+}
+
+// Backups: Sistema de backup e restauração
+model Backup {
+  id            String       @id @default(cuid())
+  name          String
+  description   String?
+  type          BackupType
+  status        BackupStatus @default(PENDING)
+  size          BigInt?      // Tamanho em bytes
+  location      String?      // Caminho ou URL do backup
+  tablesIncluded String[]    // Tabelas incluídas no backup
+  recordCount   Int?         // Número de registros
+  createdBy     String       // ID do admin que criou
+  createdAt     DateTime     @default(now())
+  completedAt   DateTime?
+  expiresAt     DateTime?
+  restoredAt    DateTime?
+  restoredBy    String?
+  metadata      Json?
+
+  @@index([status, createdAt])
+  @@index([createdBy])
+  @@map("backups")
+}
+
+// Relatórios: Sistema de geração de relatórios
+model Report {
+  id            String       @id @default(cuid())
+  title         String
+  description   String?
+  type          ReportType
+  format        ReportFormat
+  status        ReportStatus @default(PENDING)
+  parameters    Json?        // Parâmetros usados (filtros, datas, etc)
+  fileUrl       String?      // URL do arquivo gerado
+  fileSize      BigInt?      // Tamanho em bytes
+  recordCount   Int?         // Número de registros
+  generatedBy   String       // ID do usuário que gerou
+  generatedAt   DateTime     @default(now())
+  completedAt   DateTime?
+  expiresAt     DateTime?    // Data de expiração do arquivo
+  downloaded    Boolean      @default(false)
+  downloadCount Int          @default(0)
+  metadata      Json?
+
+  @@index([status, generatedAt])
+  @@index([generatedBy])
+  @@index([type])
+  @@map("reports")
+}
+
+// Enums para os novos models
+
+enum SecurityEventType {
+  FAILED_LOGIN
+  SUSPICIOUS_LOGIN
+  PASSWORD_CHANGE
+  EMAIL_CHANGE
+  ACCOUNT_LOCKED
+  BRUTE_FORCE_ATTEMPT
+  UNAUTHORIZED_ACCESS
+  DATA_BREACH_ATTEMPT
+  PRIVILEGE_ESCALATION
+  UNUSUAL_ACTIVITY
+}
+
+enum SecuritySeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum BackupType {
+  FULL
+  INCREMENTAL
+  DIFFERENTIAL
+  MANUAL
+  SCHEDULED
+}
+
+enum BackupStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+enum ReportType {
+  USERS
+  ANALYTICS
+  SECURITY
+  SESSIONS
+  AUDIT
+  CUSTOM
+}
+
+enum ReportFormat {
+  PDF
+  EXCEL
+  CSV
+  JSON
+}
+
+enum ReportStatus {
+  PENDING
+  GENERATING
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+// Orçamento Mensal
+model Budget {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String   // Nome do orçamento (ex: "Fevereiro 2026")
+  month         Int      // Mês (1-12)
+  year          Int      // Ano
+  category      String   // Categoria do orçamento
+  limitAmount   Float    // Valor limite planejado
+  spentAmount   Float    @default(0) // Valor gasto atual
+  alertThreshold Float   @default(80) // % para alertar (padrão 80%)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  alerts        BudgetAlert[]
+
+  @@unique([userId, category, month, year])
+  @@index([userId, month, year])
+  @@map("budgets")
+}
+
+// Alertas de Orçamento
+model BudgetAlert {
+  id          String   @id @default(cuid())
+  budgetId    String
+  userId      String
+  message     String
+  percentage  Float    // Percentual atingido quando o alerta foi gerado
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  budget      Budget   @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([budgetId])
+  @@map("budget_alerts")
+}
+
+// Sistema de Notificações
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  metadata    Json?            // Dados adicionais
+  isRead      Boolean          @default(false)
+  priority    NotificationPriority @default(NORMAL)
+  actionUrl   String?          // URL para ação relacionada
+  createdAt   DateTime         @default(now())
+  readAt      DateTime?
+
+  @@index([userId, isRead, createdAt])
+  @@map("notifications")
+}
+
+// Relatórios Personalizados Salvos
+model CustomReport {
+  id            String        @id @default(cuid())
+  userId        String
+  name          String
+  description   String?
+  reportType    ReportType
+  filters       Json          // Filtros aplicados (período, categorias, etc)
+  config        Json?         // Configurações de visualização
+  isPublic      Boolean       @default(false)
+  isFavorite    Boolean       @default(false)
+  lastGenerated DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  @@index([userId, isFavorite])
+  @@map("custom_reports")
+}
+
+enum NotificationType {
+  BUDGET_ALERT        // Alerta de orçamento
+  PAYMENT_DUE         // Conta a vencer
+  PAYMENT_OVERDUE     // Conta vencida
+  GOAL_ACHIEVED       // Meta alcançada
+  WEEKLY_SUMMARY      // Resumo semanal
+  MONTHLY_SUMMARY     // Resumo mensal
+  SYSTEM              // Notificação do sistema
+  SECURITY            // Alerta de segurança
+}
+
+enum NotificationPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
 }
