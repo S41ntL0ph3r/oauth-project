@@ -62,22 +62,22 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   const sidebarItems: SidebarItem[] = [
     {
-      label: "Orçamento",
+      label: "Budget",
       href: "/budget",
       icon: "💰",
-      description: "Planejamento mensal",
+      description: "Monthly planning",
     },
     {
-      label: "Relatórios",
+      label: "Reports",
       href: "/relatorios",
       icon: "📊",
-      description: "Relatórios personalizados",
+      description: "Custom reports",
     },
     {
-      label: "Notificações",
+      label: "Notifications",
       href: "/notificacoes",
       icon: "🔔",
-      description: "Alertas e avisos",
+      description: "Alerts and warnings",
     },
     {
       label: "Analytics",
@@ -197,7 +197,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Footer da sidebar */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-            <p>© 2026 Gestão Financeira</p>
+            <p>© 2026 Financial Management</p>
           </div>
         </div>
       </aside>

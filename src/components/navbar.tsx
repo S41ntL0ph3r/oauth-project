@@ -76,7 +76,7 @@ const NavContainer = ({ onToggleSidebar }: NavContainerProps) => {
             href="/" 
             className="font-bold text-xl text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2"
           >
-            Gestão Financeira
+            Financial Management
           </Link>
         </div>
 
