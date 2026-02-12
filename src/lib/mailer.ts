@@ -46,40 +46,40 @@ export async function sendPasswordResetEmail(to: string, token: string) {
   const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
   const resetUrl = `${baseUrl}/reset-password?token=${token}`;
   
-  const subject = "Redefinição de senha - Sistema Financeiro";
+  const subject = "Password Reset - Financial Management System";
   const text = `
-    Você solicitou a redefinição de senha para sua conta.
+    You requested a password reset for your account.
     
-    Clique no link abaixo para redefinir sua senha:
+    Click the link below to reset your password:
     ${resetUrl}
     
-    Este link expira em 1 hora.
+    This link expires in 1 hour.
     
-    Se você não solicitou esta redefinição, ignore este email.
+    If you did not request this reset, please ignore this email.
   `;
   
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      <h2 style="color: #333;">Redefinição de senha</h2>
-      <p>Você solicitou a redefinição de senha para sua conta no Sistema de Gerenciamento Financeiro.</p>
+      <h2 style="color: #333;">Password Reset</h2>
+      <p>You requested a password reset for your account in the Financial Management System.</p>
       
       <div style="margin: 30px 0;">
         <a href="${resetUrl}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
-          Redefinir Senha
+          Reset Password
         </a>
       </div>
       
       <p style="font-size: 14px; color: #666;">
-        Se o botão não funcionar, copie e cole este link no seu navegador:<br>
+        If the button doesn't work, copy and paste this link into your browser:<br>
         <a href="${resetUrl}">${resetUrl}</a>
       </p>
       
       <p style="font-size: 14px; color: #666;">
-        Este link expira em <strong>1 hora</strong>.
+        This link expires in <strong>1 hour</strong>.
       </p>
       
       <p style="font-size: 14px; color: #666;">
-        Se você não solicitou esta redefinição, ignore este email com segurança.
+        If you did not request this reset, please ignore this email securely.
       </p>
     </div>
   `;

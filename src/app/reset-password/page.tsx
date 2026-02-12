@@ -19,7 +19,7 @@ export default function ResetPasswordPage() {
     if (tokenParam) {
       setToken(tokenParam);
     } else {
-      setError('Token não encontrado. Solicite uma nova redefinição de senha.');
+      setError('Token not found. Request a new password reset.');
     }
   }, [searchParams]);
 
@@ -30,13 +30,13 @@ export default function ResetPasswordPage() {
     setMessage('');
 
     if (password !== confirmPassword) {
-      setError('As senhas não coincidem');
+      setError('Passwords do not match');
       setLoading(false);
       return;
     }
 
     if (password.length < 6) {
-      setError('A senha deve ter pelo menos 6 caracteres');
+      setError('Password must be at least 6 characters');
       setLoading(false);
       return;
     }
@@ -84,10 +84,10 @@ export default function ResetPasswordPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Redefinir senha
+            Reset Password
           </h1>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Digite sua nova senha
+            Enter your new password
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
           <div className="rounded-md bg-green-50 dark:bg-green-900/20 p-4 text-center">
             <p className="text-sm text-green-800 dark:text-green-200 mb-2">{message}</p>
             <p className="text-xs text-green-600 dark:text-green-300">
-              Redirecionando para o login em alguns segundos...
+              Redirecting to login in a few seconds...
             </p>
           </div>
         ) : (
@@ -103,7 +103,7 @@ export default function ResetPasswordPage() {
             <div className="space-y-4">
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Nova senha
+                  New password
                 </label>
                 <input
                   id="password"
@@ -112,7 +112,7 @@ export default function ResetPasswordPage() {
                   autoComplete="new-password"
                   required
                   className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                  placeholder="Digite sua nova senha"
+                  placeholder="Enter your new password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
@@ -121,7 +121,7 @@ export default function ResetPasswordPage() {
 
               <div>
                 <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Confirmar nova senha
+                  Confirm new password
                 </label>
                 <input
                   id="confirmPassword"
@@ -130,7 +130,7 @@ export default function ResetPasswordPage() {
                   autoComplete="new-password"
                   required
                   className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                  placeholder="Confirme sua nova senha"
+                  placeholder="Confirm your new password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={loading}

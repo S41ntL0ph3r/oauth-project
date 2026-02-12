@@ -1,4 +1,4 @@
-# 🔐 Sistema de Autenticação Moderno com Painel Admin
+# 🔐 Modern Authentication System with Admin Panel
 
 <div align="center">
 
@@ -9,139 +9,139 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-336791?style=for-the-badge&logo=postgresql)
 
-*Plataforma completa de autenticação com painel administrativo profissional*
+*Complete authentication platform with professional admin panel*
 
-[Recursos](#-recursos-principais) • [Admin Panel](#-painel-administrativo) • [Instalação](#-instalação) • [Deploy](#-deploy-no-vercel)
+[Features](#-key-features) • [Admin Panel](#-administrative-panel) • [Installation](#-installation) • [Deploy](#-deploy-to-vercel)
 
 </div>
 
 ---
 
-## 🎯 **Sobre o Projeto**
+## 🎯 **About the Project**
 
-Sistema de **autenticação completo e moderno** com painel administrativo profissional. Construído com as melhores práticas de segurança, oferece gestão completa de usuários, produtos e logs de atividade.
+A **complete and modern authentication system** with professional admin panel. Built with security best practices, it offers complete management of users, products, and activity logs.
 
-### ✨ **Diferenciais do Sistema**
-- 🔐 **Autenticação Híbrida** - OAuth (GitHub) + Credenciais locais
-- 🛡️ **Painel Admin Completo** - Gestão de usuários, produtos e permissões
-- 📧 **Sistema de Email** - Verificação e recuperação via EmailJS
-- 🔒 **Segurança Avançada** - JWT, bcrypt, rate limiting, XSS protection
-- 🎨 **Interface Moderna** - Design responsivo com modo escuro/claro
-- ⚡ **Performance Otimizada** - Next.js 15 App Router com TypeScript
-- 📊 **Analytics Completo** - Métricas, gráficos e insights em tempo real
-- 🔐 **Logs de Segurança** - Rastreamento de sessões e eventos suspeitos
-- 💾 **Backup Automatizado** - Sistema de backup e restauração
-- 📈 **Relatórios Exportáveis** - PDF, Excel, CSV e JSON
-
----
-
-## 🌟 **Recursos Principais**
-
-### 👤 **Autenticação de Usuários**
-- 🔑 **Login OAuth com GitHub** - Integração nativa e segura
-- 📝 **Registro com credenciais** - Email e senha com validação
-- ✅ **Verificação de email** - Links seguros via EmailJS
-- 🔐 **Sessões JWT persistentes** - NextAuth v5 com Prisma
-- � **Recuperação de senha** - Tokens temporários seguros
-
-### 🛡️ **Painel Administrativo**
-- 👥 **Gestão de Usuários** - CRUD completo com busca e filtros
-- 🛍️ **Gestão de Produtos** - Cadastro, estoque, categorias e imagens
-- 👨‍💼 **Gestão de Admins** - Controle de permissões (SUPER_ADMIN, ADMIN, EDITOR)
-- 📊 **Dashboard com Métricas** - Gráficos e estatísticas em tempo real
-- 📋 **Logs de Atividade** - Rastreamento completo de ações administrativas
-- ⚙️ **Configurações** - Email, segurança, aparência e sistema
-- 🔒 **Autenticação JWT** - Cookies HTTP-only seguros
-
-### 👤 **Gerenciamento de Perfil**
-- 🖼️ **Upload de avatar** - Imagens locais com otimização
-- ✏️ **Edição de dados** - Nome, email e informações pessoais
-- 🔑 **Alteração de senha** - Modal seguro com validação forte
-- 🗑️ **Reset de avatar** - Voltar ao avatar padrão
-
-### 🎨 **Experiência do Usuário**
-- 🌙 **Modo escuro/claro** - Preferência salva localmente
-- 📱 **Design responsivo** - Mobile-first approach
-- ⚡ **Cache inteligente** - Service Worker para performance
-- 🔔 **Feedbacks visuais** - Loading states e notificações
-- ♿ **Acessibilidade** - Interface WCAG compliant
-
-### 📊 **Analytics & Métricas** ⭐ NOVO
-- 📈 **Dashboard Interativo** - Gráficos em tempo real com Recharts
-- 👥 **Métricas de Usuários** - Total, novos, taxa de verificação
-- 📊 **Análise de Crescimento** - Gráficos de linha e barra
-- 💻 **Demografia** - Dispositivos e navegadores mais usados
-- ⏱️ **Períodos Customizáveis** - 7, 14, 30 ou 90 dias
-
-### 🔒 **Logs de Sessão & Segurança** ⭐ NOVO
-- 🔐 **Sessões Ativas** - Visualizar e revogar dispositivos conectados
-- 📋 **Histórico Completo** - Logs de login, logout e ações
-- 🚨 **Eventos de Segurança** - Monitoramento de atividades suspeitas
-- 🌍 **Geolocalização** - IP, país, cidade de cada acesso
-- 🔔 **Alertas** - Severidade: LOW, MEDIUM, HIGH, CRITICAL
-
-### 💾 **Backup & Restauração** ⭐ NOVO
-- 📦 **Backups Completos** - Manual, Full, Incremental, Diferencial
-- 🎯 **Seleção de Tabelas** - Escolha o que incluir no backup
-- ⬇️ **Download** - Exportar backups em JSON
-- 🔄 **Restauração** - Recuperar dados com segurança
-- ⏰ **Agendamento** - Preparado para backups automáticos
-
-### 📈 **Relatórios Exportáveis** ⭐ NOVO
-- 📄 **Múltiplos Formatos** - CSV, Excel, JSON, PDF
-- 📊 **Tipos Variados** - Usuários, Analytics, Segurança, Sessões, Auditoria
-- 🎨 **Templates Visuais** - Interface intuitiva e moderna
-- 📥 **Download Fácil** - Relatórios prontos para uso
-- ⏱️ **Geração Assíncrona** - Não bloqueia a interface
+### ✨ **System Highlights**
+- 🔐 **Hybrid Authentication** - OAuth (GitHub) + Local credentials
+- 🛡️ **Complete Admin Panel** - User, product, and permission management
+- 📧 **Email System** - Verification and recovery via EmailJS
+- 🔒 **Advanced Security** - JWT, bcrypt, rate limiting, XSS protection
+- 🎨 **Modern Interface** - Responsive design with dark/light mode
+- ⚡ **Optimized Performance** - Next.js 15 App Router with TypeScript
+- 📊 **Complete Analytics** - Real-time metrics, charts, and insights
+- 🔐 **Security Logs** - Session tracking and suspicious event monitoring
+- 💾 **Automated Backup** - Backup and restore system
+- 📈 **Exportable Reports** - PDF, Excel, CSV, and JSON
 
 ---
 
-## 🔐 **Painel Administrativo**
+## 🌟 **Key Features**
 
-### **Funcionalidades Admin:**
+### 👤 **User Authentication**
+- 🔑 **OAuth Login with GitHub** - Native and secure integration
+- 📝 **Credential Registration** - Email and password with validation
+- ✅ **Email Verification** - Secure links via EmailJS
+- 🔐 **Persistent JWT Sessions** - NextAuth v5 with Prisma
+- � **Password Recovery** - Secure temporary tokens
+
+### 🛡️ **Administrative Panel**
+- 👥 **User Management** - Complete CRUD with search and filters
+- 🛍️ **Product Management** - Registration, inventory, categories, and images
+- 👨‍💼 **Admin Management** - Permission control (SUPER_ADMIN, ADMIN, EDITOR)
+- 📊 **Dashboard with Metrics** - Real-time charts and statistics
+- 📋 **Activity Logs** - Complete tracking of administrative actions
+- ⚙️ **Settings** - Email, security, appearance, and system
+- 🔒 **JWT Authentication** - Secure HTTP-only cookies
+
+### 👤 **Profile Management**
+- 🖼️ **Avatar Upload** - Local images with optimization
+- ✏️ **Data Editing** - Name, email, and personal information
+- 🔑 **Password Change** - Secure modal with strong validation
+- 🗑️ **Avatar Reset** - Return to default avatar
+
+### 🎨 **User Experience**
+- 🌙 **Dark/Light Mode** - Preference saved locally
+- 📱 **Responsive Design** - Mobile-first approach
+- ⚡ **Intelligent Cache** - Service Worker for performance
+- 🔔 **Visual Feedback** - Loading states and notifications
+- ♿ **Accessibility** - WCAG compliant interface
+
+### 📊 **Analytics & Metrics** ⭐ NEW
+- 📈 **Interactive Dashboard** - Real-time charts with Recharts
+- 👥 **User Metrics** - Total, new, verification rate
+- 📊 **Growth Analysis** - Line and bar charts
+- 💻 **Demographics** - Most used devices and browsers
+- ⏱️ **Customizable Periods** - 7, 14, 30, or 90 days
+
+### 🔒 **Session Logs & Security** ⭐ NEW
+- 🔐 **Active Sessions** - View and revoke connected devices
+- 📋 **Complete History** - Login, logout, and action logs
+- 🚨 **Security Events** - Monitoring of suspicious activities
+- 🌍 **Geolocation** - IP, country, city of each access
+- 🔔 **Alerts** - Severity: LOW, MEDIUM, HIGH, CRITICAL
+
+### 💾 **Backup & Restore** ⭐ NEW
+- 📦 **Complete Backups** - Manual, Full, Incremental, Differential
+- 🎯 **Table Selection** - Choose what to include in backup
+- ⬇️ **Download** - Export backups in JSON
+- 🔄 **Restore** - Recover data securely
+- ⏰ **Scheduling** - Ready for automatic backups
+
+### 📈 **Exportable Reports** ⭐ NEW
+- 📄 **Multiple Formats** - CSV, Excel, JSON, PDF
+- 📊 **Various Types** - Users, Analytics, Security, Sessions, Audit
+- 🎨 **Visual Templates** - Intuitive and modern interface
+- 📥 **Easy Download** - Ready-to-use reports
+- ⏱️ **Asynchronous Generation** - Does not block the interface
+
+---
+
+## 🔐 **Administrative Panel**
+
+### **Admin Features:**
 
 #### 📊 **Dashboard**
-- Métricas em tempo real (usuários, produtos, admins)
-- Gráficos de atividade com Recharts
-- Logs recentes de ações administrativas
-- Cards com estatísticas rápidas
+- Real-time metrics (users, products, admins)
+- Activity charts with Recharts
+- Recent logs of administrative actions
+- Cards with quick statistics
 
-#### 👥 **Gestão de Usuários**
-- Listagem completa com paginação
-- Busca por nome/email
-- Filtros por status e data
-- Ações: Editar, Suspender, Excluir
-- Reset de senha administrativo
-- Visualização de perfil completo
+#### 👥 **User Management**
+- Complete listing with pagination
+- Search by name/email
+- Filters by status and date
+- Actions: Edit, Suspend, Delete
+- Administrative password reset
+- Complete profile view
 
-#### 🛍️ **Gestão de Produtos**
-- CRUD completo de produtos
-- Upload múltiplo de imagens
-- Controle de estoque
-- Categorização
-- Status (Ativo, Inativo, Sem Estoque)
-- Filtros avançados
+#### 🛍️ **Product Management**
+- Complete product CRUD
+- Multiple image upload
+- Stock control
+- Categorization
+- Status (Active, Inactive, Out of Stock)
+- Advanced filters
 
-#### 👨‍💼 **Gestão de Administradores**
-- Criação de novos admins
-- Controle de permissões por role
-- Status: Ativo, Suspenso, Inativo
-- Último login registrado
-- Hierarquia de permissões
+#### 👨‍💼 **Administrator Management**
+- Creation of new admins
+- Permission control by role
+- Status: Active, Suspended, Inactive
+- Last login recorded
+- Permission hierarchy
 
-#### 📋 **Logs de Atividade**
-- Registro de todas as ações admin
-- Filtros por tipo de ação
-- IP e User Agent tracking
-- Exportação de dados
-- Detalhes completos de cada ação
+#### 📋 **Activity Logs**
+- Record of all admin actions
+- Filters by action type
+- IP and User Agent tracking
+- Data export
+- Complete details of each action
 
-#### ⚙️ **Configurações**
-- Configurações gerais do site
-- Setup de email (SMTP)
-- Segurança e autenticação
-- Aparência e temas
-- Notificações
+#### ⚙️ **Settings**
+- General site settings
+- Email setup (SMTP)
+- Security and authentication
+- Appearance and themes
+- Notifications
 
 ### **Permissões de Acesso:**
 - 🔴 **SUPER_ADMIN**: Acesso total ao sistema
@@ -150,235 +150,218 @@ Sistema de **autenticação completo e moderno** com painel administrativo profi
 
 ---
 
-## 🚀 **URLs do Projeto**
+## 🚀 **Project URLs**
 
-### **Aplicação Principal:**
+### **Main Application:**
 - **Homepage**: https://oauth-project-s41ntl0ph3r.vercel.app
 - **Login**: https://oauth-project-s41ntl0ph3r.vercel.app/sign-in
-- **Registro**: https://oauth-project-s41ntl0ph3r.vercel.app/sign-up
+- **Register**: https://oauth-project-s41ntl0ph3r.vercel.app/sign-up
 
-### **Painel Administrativo:**
+### **Administrative Panel:**
 - **Admin Login**: https://oauth-project-s41ntl0ph3r.vercel.app/admin/login
-- **Setup Inicial**: https://oauth-project-s41ntl0ph3r.vercel.app/admin/setup
+- **Initial Setup**: https://oauth-project-s41ntl0ph3r.vercel.app/admin/setup
 - **Dashboard**: https://oauth-project-s41ntl0ph3r.vercel.app/admin
 
 ---
 
 ## 🛠️ **Instalação**
 
-### **Pré-requisitos**
+### **Prerequisites**
 - Node.js 18+ 
-- npm ou yarn
+- npm or yarn
 - Git
-- PostgreSQL (ou conta no Neon/PlanetScale)
+- PostgreSQL (or account on Neon/PlanetScale)
 
-### **Passo a passo**
+### **Step by Step**
 
 ```bash
-# Clone o repositório
+# Clone the repository
 git clone https://github.com/S41ntL0ph3r/oauth-project.git
 cd oauth-project
 
-### **Passo a passo**
-
-```bash
-# Clone o repositório
-git clone https://github.com/S41ntL0ph3r/oauth-project.git
-cd oauth-project
-
-# Instale as dependências
+# Install dependencies
 npm install
 
-# Configure as variáveis de ambiente
+# Configure environment variables
 cp .env.example .env.local
-# Edite o .env.local com suas configurações
+# Edit .env.local with your settings
 
-# Execute as migrações do banco
+# Run database migrations
 npx prisma db push
 
-# Inicie o servidor de desenvolvimento
+# Start development server
 npm run dev
 ```
 
-### **Configuração OAuth GitHub**
-1. Acesse [GitHub Developer Settings](https://github.com/settings/developers)
-2. Crie uma nova OAuth App
+### **GitHub OAuth Configuration**
+1. Go to [GitHub Developer Settings](https://github.com/settings/developers)
+2. Create a new OAuth App
 3. Configure:
    - **Homepage URL:** `http://localhost:3000`
    - **Callback URL:** `http://localhost:3000/api/auth/callback/github`
-4. Adicione as credenciais no `.env.local`
+4. Add credentials in `.env.local`
 
-### **Variáveis de Ambiente Obrigatórias**
+### **Required Environment Variables**
 ```env
-# Autenticação
-AUTH_SECRET="sua-chave-secreta-64-caracteres"
-ADMIN_JWT_SECRET="chave-admin-diferente-64-caracteres"
+# Authentication
+AUTH_SECRET="your-secret-key-64-characters"
+ADMIN_JWT_SECRET="different-admin-key-64-characters"
 
-# Banco de Dados
+# Database
 DATABASE_URL="postgresql://user:pass@host:5432/db"
 
 # GitHub OAuth
-AUTH_GITHUB_ID="seu-github-client-id"
-AUTH_GITHUB_SECRET="seu-github-client-secret"
+AUTH_GITHUB_ID="your-github-client-id"
+AUTH_GITHUB_SECRET="your-github-client-secret"
 
-# URL Base
+# Base URL
 NEXTAUTH_URL="http://localhost:3000"
 ```
 
 ---
 
-## 🚀 **Deploy no Vercel**
+## 🚀 **Deploy to Vercel**
 
-### **Configuração Rápida:**
+### **Quick Setup:**
 
-1. **Conecte ao GitHub** e configure variáveis no Vercel:
+1. **Connect to GitHub** and configure variables in Vercel:
 ```bash
-AUTH_SECRET="sua-chave-super-secreta-64-caracteres"
-ADMIN_JWT_SECRET="chave-admin-diferente-64-caracteres"
+AUTH_SECRET="your-super-secret-key-64-characters"
+ADMIN_JWT_SECRET="different-admin-key-64-characters"
 DATABASE_URL="postgresql://user:pass@host:5432/db?sslmode=require"
-AUTH_GITHUB_ID="seu-github-oauth-id"
-AUTH_GITHUB_SECRET="seu-github-oauth-secret"
-NEXTAUTH_URL="https://seu-dominio.vercel.app"
+AUTH_GITHUB_ID="your-github-oauth-id"
+AUTH_GITHUB_SECRET="your-github-oauth-secret"
+NEXTAUTH_URL="https://your-domain.vercel.app"
 ```
 
 2. **Configure GitHub OAuth:**
-   - Callback URL: `https://seu-dominio.vercel.app/api/auth/callback/github`
+   - Callback URL: `https://your-domain.vercel.app/api/auth/callback/github`
 
-3. **Acesse `/admin/setup`** para criar o primeiro administrador
+3. **Access `/admin/setup`** to create the first administrator
 
-### **Banco de Dados Recomendado:**
-- **Neon**: https://neon.tech (PostgreSQL grátis)
-- **PlanetScale**: https://planetscale.com (MySQL grátis)
+### **Recommended Database:**
+- **Neon**: https://neon.tech (Free PostgreSQL)
+- **PlanetScale**: https://planetscale.com (Free MySQL)
 
 ---
 
-## 🔧 **Tecnologias**
+## 🔧 **Technologies**
 
 ### **Frontend**
-- **Next.js 15.5.9** - Framework React com App Router
-- **TypeScript 5.9** - Tipagem estática
-- **Tailwind CSS** - Estilização responsiva
-- **Lucide React** - Ícones modernos
-- **Recharts** - Gráficos e dashboards
+- **Next.js 15.5.9** - React Framework with App Router
+- **TypeScript 5.9** - Static typing
+- **Tailwind CSS** - Responsive styling
+- **Lucide React** - Modern icons
+- **Recharts** - Charts and dashboards
 
 ### **Backend**
-- **NextAuth v5** - Autenticação completa
-- **Prisma 6.16.3** - ORM type-safe
-- **PostgreSQL** - Banco de dados em produção
-- **bcryptjs** - Hash de senhas (12 rounds)
-- **jsonwebtoken** - JWT para admin panel
+- **NextAuth v5** - Complete authentication
+- **Prisma 6.16.3** - Type-safe ORM
+- **PostgreSQL** - Production database
+- **bcryptjs** - Password hashing (12 rounds)
+- **jsonwebtoken** - JWT for admin panel
 
-### **Segurança**
-- **HTTP-only cookies** - Tokens seguros
-- **Rate limiting** - Proteção contra brute force
-- **XSS protection** - Headers de segurança
-- **Input validation** - Sanitização de dados
-- **Role-based access** - Controle de permissões
+### **Security**
+- **HTTP-only cookies** - Secure tokens
+- **Rate limiting** - Brute force protection
+- **XSS protection** - Security headers
+- **Input validation** - Data sanitization
+- **Role-based access** - Permission control
 
 ---
 
-## 📁 **Estrutura do Projeto**
+## 📁 **Project Structure**
 
 ```
 oauth-project/
 ├── 📁 src/
 │   ├── 📁 app/
-│   │   ├── 📁 (auth)/          # Páginas de autenticação
-│   │   ├── 📁 (protected)/     # Páginas protegidas (usuários)
-│   │   ├── 📁 admin/           # Painel administrativo
-│   │   └── 📁 api/             # Rotas da API
-│   ├── 📁 components/          # Componentes reutilizáveis
-│   │   ├── 📁 admin/           # Componentes do admin
-│   │   └── 📁 ui/              # Componentes de UI
-│   ├── 📁 contexts/            # Contextos React
+│   │   ├── 📁 (auth)/          # Authentication pages
+│   │   ├── 📁 (protected)/     # Protected pages (users)
+│   │   ├── 📁 admin/           # Administrative panel
+│   │   └── 📁 api/             # API routes
+│   ├── 📁 components/          # Reusable components
+│   │   ├── 📁 admin/           # Admin components
+│   │   └── 📁 ui/              # UI components
+│   ├── 📁 contexts/            # React contexts
 │   ├── 📁 hooks/               # Custom hooks
-│   └── 📁 lib/                 # Utilitários e configurações
-│       └── 📁 admin/           # Utilitários do admin
-├── 📁 prisma/                  # Schema e migrações
-└── 📁 public/                  # Arquivos estáticos
-```
-│   ├── 📁 app/
-│   │   ├── 📁 (auth)/          # Páginas de autenticação
-│   │   ├── 📁 (protected)/     # Páginas protegidas
-│   │   └── 📁 api/             # Rotas da API
-│   ├── 📁 components/          # Componentes reutilizáveis
-│   ├── 📁 contexts/            # Contextos React
-│   └── 📁 lib/                 # Utilitários e configurações
-├── 📁 prisma/                  # Schema e migrações
-└── 📁 public/                  # Arquivos estáticos
+│   └── 📁 lib/                 # Utilities and configurations
+│       └── 📁 admin/           # Admin utilities
+├── 📁 prisma/                  # Schema and migrations
+└── 📁 public/                  # Static files
 ```
 
 ---
 
-## 🚀 **Scripts Disponíveis**
+## 🚀 **Available Scripts**
 
 ```bash
-npm run dev          # Servidor de desenvolvimento
-npm run build        # Build de produção  
-npm run start        # Servidor de produção
-npm run lint         # Verificação de código
-npm run type-check   # Verificação TypeScript
+npm run dev          # Development server
+npm run build        # Production build  
+npm run start        # Production server
+npm run lint         # Code verification
+npm run type-check   # TypeScript verification
 ```
 
 ---
 
-## � **Deploy no Vercel**
+## � **Deploy to Vercel**
 
-### **Configuração Rápida:**
+### **Quick Setup:**
 
-1. **Conecte ao GitHub** e configure variáveis no Vercel:
+1. **Connect to GitHub** and configure variables in Vercel:
 ```bash
-AUTH_SECRET="sua-chave-super-secreta-64-caracteres"
-ADMIN_JWT_SECRET="chave-admin-diferente-64-caracteres"
+AUTH_SECRET="your-super-secret-key-64-characters"
+ADMIN_JWT_SECRET="different-admin-key-64-characters"
 DATABASE_URL="postgresql://user:pass@host:5432/db?sslmode=require"
-AUTH_GITHUB_ID="seu-github-oauth-id"
-AUTH_GITHUB_SECRET="seu-github-oauth-secret"
-NEXTAUTH_URL="https://seu-dominio.vercel.app"
+AUTH_GITHUB_ID="your-github-oauth-id"
+AUTH_GITHUB_SECRET="your-github-oauth-secret"
+NEXTAUTH_URL="https://your-domain.vercel.app"
 ```
 
 2. **Configure GitHub OAuth:**
-   - Callback URL: `https://seu-dominio.vercel.app/api/auth/callback/github`
+   - Callback URL: `https://your-domain.vercel.app/api/auth/callback/github`
 
-3. **Acesse `/admin/setup`** para criar o primeiro administrador
+3. **Access `/admin/setup`** to create the first administrator
 
-### **Banco de Dados Recomendado:**
-- **Neon**: https://neon.tech (PostgreSQL grátis)
-- **PlanetScale**: https://planetscale.com (MySQL grátis)
-
----
-
-## �📈 **Roadmap Futuro**
-
-- [ ] 📊 **Gráficos e relatórios** avançados
-- [ ] 💾 **Exportação de dados** (CSV/PDF)
-- [ ] 🔔 **Notificações push** para vencimentos
-- [ ] 📱 **PWA** para instalação mobile
-- [ ] 🌐 **Multi-idiomas** (i18n)
-- [ ] 🏦 **Integração bancária** via Open Banking
-- [ ] 🤖 **IA para categorização** automática
-- [ ] 📱 **App mobile** nativo
+### **Recommended Database:**
+- **Neon**: https://neon.tech (Free PostgreSQL)
+- **PlanetScale**: https://planetscale.com (Free MySQL)
 
 ---
 
-## 🤝 **Contribuição**
+## 📈 **Future Roadmap**
 
-Contribuições são sempre bem-vindas! Se você tem ideias para melhorar este projeto:
-
-1. 🍴 Faça um fork do projeto
-2. 🌟 Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. 💾 Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. 📤 Push para a branch (`git push origin feature/AmazingFeature`)
-5. 🔀 Abra um Pull Request
-
----
-
-## 📝 **Licença**
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+- [ ] 📊 **Advanced charts and reports**
+- [ ] 💾 **Data export** (CSV/PDF)
+- [ ] 🔔 **Push notifications** for due dates
+- [ ] 📱 **PWA** for mobile installation
+- [ ] 🌐 **Multi-language** (i18n)
+- [ ] 🏦 **Banking integration** via Open Banking
+- [ ] 🤖 **AI for automatic categorization**
+- [ ] 📱 **Native mobile app**
 
 ---
 
-## 👨‍💻 **Autor**
+## 🤝 **Contributing**
+
+Contributions are always welcome! If you have ideas to improve this project:
+
+1. 🍴 Fork the project
+2. 🌟 Create a branch for your feature (`git checkout -b feature/AmazingFeature`)
+3. 💾 Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. 📤 Push to the branch (`git push origin feature/AmazingFeature`)
+5. 🔀 Open a Pull Request
+
+---
+
+## 📝 **License**
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
+
+---
+
+## 👨‍💻 **Author**
 
 **Gabriel Moreira**
 - GitHub: [@S41ntL0ph3r](https://github.com/S41ntL0ph3r)
@@ -388,8 +371,8 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 <div align="center">
 
-**⭐ Se este projeto te ajudou, considere dar uma estrela!**
+**⭐ If this project helped you, consider giving it a star!**
 
-*Desenvolvido para fins educacionais e com o foco de evoluir na prática como programador.*
+*Developed for educational purposes and focused on improving programming skills in practice.*
 
 </div>
