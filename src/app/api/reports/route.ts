@@ -68,15 +68,15 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { title, description, type, format, parameters } = body;
+    const { title, type, format, filters, groupBy } = body;
 
     if (!title || !type || !format) {
       return NextResponse.json(
-        { error: 'Título, tipo e formato são obrigatórios' },
+        { error: 'Title, type and format are required' },
         { status: 400 }
       );
     }

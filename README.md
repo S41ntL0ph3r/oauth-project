@@ -143,10 +143,10 @@ A **complete and modern authentication system** with professional admin panel. B
 - Appearance and themes
 - Notifications
 
-### **Permissões de Acesso:**
-- 🔴 **SUPER_ADMIN**: Acesso total ao sistema
-- 🟡 **ADMIN**: Gestão de usuários e produtos
-- 🟢 **EDITOR**: Apenas gestão de produtos
+### **Access Permissions:**
+- 🔴 **SUPER_ADMIN**: Full system access
+- 🟡 **ADMIN**: User and product management
+- 🟢 **EDITOR**: Product management only
 
 ---
 
