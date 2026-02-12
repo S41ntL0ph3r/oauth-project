@@ -80,7 +80,7 @@ export default function BudgetPage() {
         setTransactions(data.transactions || []);
       }
     } catch (error) {
-      console.error('Erro ao carregar dados:', error);
+      console.error('Error loading data:', error);
     } finally {
       setIsLoading(false);
     }
@@ -172,7 +172,7 @@ export default function BudgetPage() {
   };
 
   const handleDeleteBudget = async (id: string) => {
-    if (!confirm('Deseja realmente excluir este orçamento?')) return;
+    if (!confirm('Do you really want to delete this budget?')) return;
 
     try {
       const response = await fetch(`/api/budgets/${id}`, {
@@ -219,7 +219,7 @@ export default function BudgetPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando orçamentos...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading budgets...</p>
         </div>
       </div>
     );

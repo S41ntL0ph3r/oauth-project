@@ -8,22 +8,22 @@ export const APP_CONFIG = {
   },
   emails: {
     from: {
-      reset: 'OAuth Project - Suporte',
-      verify: 'OAuth Project - Boas-vindas',
-      test: 'OAuth Project - Teste'
+      reset: 'OAuth Project - Support',
+      verify: 'OAuth Project - Welcome',
+      test: 'OAuth Project - Test'
     },
     subjects: {
-      reset: 'Redefinição de Senha - OAuth Project',
-      verify: 'Bem-vindo ao OAuth Project! Confirme seu email',
-      resetTest: 'Redefinição de Senha - OAuth Project (Teste)',
-      verifyTest: 'Bem-vindo ao OAuth Project! (Teste)'
+      reset: 'Password Reset - OAuth Project',
+      verify: 'Welcome to OAuth Project! Confirm your email',
+      resetTest: 'Password Reset - OAuth Project (Test)',
+      verifyTest: 'Welcome to OAuth Project! (Test)'
     },
     messages: {
-      reset: 'Você solicitou a redefinição de sua senha. Este link é válido por 1 hora.',
-      verify: 'Obrigado por se cadastrar! Para completar seu registro e ativar sua conta, confirme seu email.',
-      welcome: 'Seja bem-vindo ao OAuth Project!',
-      resetTest: 'Este é um teste do template de redefinição de senha.',
-      verifyTest: 'Este é um teste do template de verificação de email.'
+      reset: 'You requested to reset your password. This link is valid for 1 hour.',
+      verify: 'Thank you for signing up! To complete your registration and activate your account, confirm your email.',
+      welcome: 'Welcome to OAuth Project!',
+      resetTest: 'This is a test of the password reset template.',
+      verifyTest: 'This is a test of the email verification template.'
     }
   },
   tokens: {

@@ -44,10 +44,10 @@ export default function ForgotPasswordPage() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Esqueceu sua senha?
+            Forgot your password?
           </h1>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Digite seu email e enviaremos um link para redefinir sua senha
+            Enter your email and we'll send you a link to reset your password
           </p>
         </div>
 
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
               autoComplete="email"
               required
               className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-              placeholder="Digite seu email"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Enviando...' : 'Enviar link de redefinição'}
+              {loading ? 'Sending...' : 'Send reset link'}
             </button>
           </div>
 
@@ -97,7 +97,7 @@ export default function ForgotPasswordPage() {
               href="/sign-in"
               className="text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
             >
-              Voltar para o login
+              Back to login
             </Link>
           </div>
         </form>

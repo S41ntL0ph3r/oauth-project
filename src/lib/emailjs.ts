@@ -26,7 +26,7 @@ export const sendEmail = async (templateData: EmailData, templateType: 'reset' |
     const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
     if (!serviceId || !templateId || !publicKey) {
-      console.error(`EmailJS não está configurado corretamente para ${templateType}. Verifique as variáveis de ambiente.`);
+      console.error(`EmailJS is not configured correctly for ${templateType}. Check environment variables.`);
       return false;
     }
 
@@ -46,15 +46,15 @@ export const sendEmail = async (templateData: EmailData, templateType: 'reset' |
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`EmailJS API erro (${response.status}):`, errorText);
+      console.error(`EmailJS API error (${response.status}):`, errorText);
       return false;
     }
 
     const result = await response.text();
-    console.log(`Email ${templateType} enviado com sucesso:`, result);
+    console.log(`Email ${templateType} sent successfully:`, result);
     return true;
   } catch (error) {
-    console.error(`Erro ao enviar email ${templateType}:`, error);
+    console.error(`Error sending email ${templateType}:`, error);
     return false;
   }
 };

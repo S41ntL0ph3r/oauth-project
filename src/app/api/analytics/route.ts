@@ -7,17 +7,17 @@ export async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const period = searchParams.get('period') || '7'; // dias
+    const period = searchParams.get('period') || '7'; // days
     const metric = searchParams.get('metric');
 
     const days = parseInt(period);
     const startDate = subDays(new Date(), days);
 
-    // Se um métrico específico foi solicitado
+    // If a specific metric was requested
     if (metric) {
       const data = await prisma.analytics.findMany({
         where: {
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
       return NextResponse.json(data);
     }
 
-    // Buscar todas as métricas do período
+    // Fetch all metrics for the period
     const [
       totalUsers,
       newUsersToday,
@@ -42,10 +42,10 @@ export async function GET(request: Request) {
       totalSessionLogs,
       securityEventsCount,
     ] = await Promise.all([
-      // Total de usuários
+      // Total users
       prisma.user.count(),
 
-      // Novos usuários hoje
+      // New users today
       prisma.user.count({
         where: {
           createdAt: {
@@ -191,9 +191,9 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Erro ao buscar analytics:', error);
+    console.error('Error fetching analytics:', error);
     return NextResponse.json(
-      { error: 'Erro ao buscar métricas' },
+      { error: 'Error fetching metrics' },
       { status: 500 }
     );
   }
@@ -204,7 +204,7 @@ export async function POST(request: Request) {
   try {
     const session = await auth();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
@@ -212,7 +212,7 @@ export async function POST(request: Request) {
 
     if (!metric || value === undefined) {
       return NextResponse.json(
-        { error: 'Métrica e valor são obrigatórios' },
+        { error: 'Metric and value are required' },
         { status: 400 }
       );
     }
@@ -227,9 +227,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(analytics, { status: 201 });
   } catch (error) {
-    console.error('Erro ao criar métrica:', error);
+    console.error('Error creating metric:', error);
     return NextResponse.json(
-      { error: 'Erro ao criar métrica' },
+      { error: 'Error creating metric' },
       { status: 500 }
     );
   }

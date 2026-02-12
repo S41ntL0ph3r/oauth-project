@@ -185,7 +185,7 @@ export default function NotificationsPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Carregando notificações...</p>
+          <p className="text-gray-600 dark:text-gray-400">Loading notifications...</p>
         </div>
       </div>
     );
@@ -468,7 +468,7 @@ export default function NotificationsPage() {
             <div>
               <p className="font-medium text-gray-900 dark:text-white">📧 Notificações por Email</p>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Enviar notificações importantes por email
+                Send important notifications via email
               </p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">

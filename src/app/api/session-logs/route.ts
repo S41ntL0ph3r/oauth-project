@@ -63,15 +63,15 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Erro ao buscar logs de sessão:', error);
+    console.error('Error fetching session logs:', error);
     return NextResponse.json(
-      { error: 'Erro ao buscar logs' },
+      { error: 'Error fetching logs' },
       { status: 500 }
     );
   }
 }
 
-// POST: Criar log de sessão
+// POST: Create session log
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -94,7 +94,7 @@ export async function POST(request: Request) {
 
     if (!userId || !action) {
       return NextResponse.json(
-        { error: 'userId e action são obrigatórios' },
+        { error: 'userId and action are required' },
         { status: 400 }
       );
     }
@@ -135,9 +135,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(log, { status: 201 });
   } catch (error) {
-    console.error('Erro ao criar log de sessão:', error);
+    console.error('Error creating session log:', error);
     return NextResponse.json(
-      { error: 'Erro ao criar log' },
+      { error: 'Error creating log' },
       { status: 500 }
     );
   }
