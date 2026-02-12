@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import Navbar from "@/components/navbar";
 import { UserProvider } from "@/contexts/user-context";
+import ProtectedLayoutClient from "@/components/protected-layout-client";
 
 export default async function ProtectedLayout({
   children,
@@ -16,12 +16,7 @@ export default async function ProtectedLayout({
 
   return (
     <UserProvider>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navbar />
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-          {children}
-        </main>
-      </div>
+      <ProtectedLayoutClient>{children}</ProtectedLayoutClient>
     </UserProvider>
   );
 }
