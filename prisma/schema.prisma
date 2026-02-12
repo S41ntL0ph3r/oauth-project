@@ -434,3 +434,17 @@ enum NotificationPriority {
   HIGH
   URGENT
 }
+
+// Audit Log para conformidade LGPD/GDPR (Art. 37)
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String   // VIEW_ANALYTICS, EXPORT_DATA, DELETE_DATA, etc
+  ipAddress   String?  // IP anonimizado (192.168.xxx.xxx)
+  metadata    Json?    // Dados adicionais sobre a ação
+  timestamp   DateTime @default(now())
+
+  @@index([userId, timestamp])
+  @@index([action, timestamp])
+  @@map("audit_logs")
+}
