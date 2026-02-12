@@ -8,8 +8,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Retornar configurações padrão ou buscar do banco de dados
-    // Por enquanto, retornamos configurações padrão
+    // Return default settings or fetch from database
+    // For now, return default settings
     const settings = {
       budgetAlerts: true,
       paymentReminders: true,
@@ -35,8 +35,8 @@ export async function PUT(request: NextRequest) {
 
     const body = await request.json();
 
-    // Aqui você pode salvar as configurações no banco de dados
-    // Por enquanto, apenas retornamos sucesso
+    // Here you can save settings to the database
+    // For now, just return success
     
     return NextResponse.json({ settings: body });
   } catch (error) {

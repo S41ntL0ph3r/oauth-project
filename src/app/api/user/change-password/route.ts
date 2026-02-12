@@ -39,19 +39,19 @@ export async function POST(request: NextRequest) {
     
     if (!hasLowerCase || !hasUpperCase || !hasNumber || !hasSpecialChar) {
       return NextResponse.json(
-        { error: "A senha deve conter pelo menos: 1 letra maiúscula, 1 minúscula, 1 número e 1 caractere especial" },
+        { error: "Password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character" },
         { status: 400 }
       );
     }
 
-    // Buscar o usuário no banco de dados
+    // Fetch user from database
     const user = await db.user.findUnique({
       where: { email: session.user.email },
     });
 
     if (!user || !user.password) {
       return NextResponse.json(
-        { error: "Usuário não encontrado ou não possui senha" },
+        { error: "User not found or has no password" },
         { status: 404 }
       );
     }

@@ -55,9 +55,9 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Erro ao buscar relatórios:', error);
+    console.error('Error fetching reports:', error);
     return NextResponse.json(
-      { error: 'Erro ao buscar relatórios' },
+      { error: 'Error fetching reports' },
       { status: 500 }
     );
   }
@@ -94,15 +94,15 @@ export async function POST(request: Request) {
       },
     });
 
-    // Iniciar processo de geração (simulado)
+    // Start generation process (simulated)
     setTimeout(async () => {
       try {
-        await prisma.report.update({
+        await prisma.report.update(
           where: { id: report.id },
           data: { status: 'GENERATING' },
-        });
+        );
 
-        // Buscar dados baseado no tipo
+        // Fetch data based on type
         let reportData: unknown[] = [];
 
         switch (type) {
@@ -192,8 +192,8 @@ export async function POST(request: Request) {
           fileContent = JSON.stringify(reportData, null, 2);
           await fs.writeFile(filepath, fileContent, 'utf-8');
         } else if (format === 'EXCEL') {
-          // Para Excel, salvamos como CSV por enquanto
-          // Em produção, use biblioteca como 'xlsx'
+          // For Excel, we save as CSV for now
+          // In production, use library like 'xlsx'
           filepath = path.join(reportsDir, `${filename}.csv`);
           fileContent = Papa.unparse(reportData);
           await fs.writeFile(filepath, fileContent, 'utf-8');

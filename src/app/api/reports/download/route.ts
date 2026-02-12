@@ -74,7 +74,7 @@ export async function GET(request: Request) {
         break;
       case 'EXCEL':
         contentType = 'application/vnd.ms-excel';
-        extension = 'csv'; // Por enquanto, até implementar XLSX real
+        extension = 'csv'; // For now, until implementing real XLSX
         break;
       case 'PDF':
         contentType = 'application/pdf';
@@ -82,7 +82,7 @@ export async function GET(request: Request) {
         break;
     }
 
-    // Atualizar contador de downloads
+    // Update download counter
     await prisma.report.update({
       where: { id: reportId },
       data: {
@@ -93,7 +93,7 @@ export async function GET(request: Request) {
 
     const filename = `${report.title.replace(/[^a-z0-9]/gi, '_')}.${extension}`;
 
-    // Retornar arquivo para download
+    // Return file for download
     return new NextResponse(new Uint8Array(fileBuffer), {
       headers: {
         'Content-Type': contentType,
@@ -101,7 +101,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Erro ao baixar relatório:', error);
+    console.error('Error downloading report:', error);
     return NextResponse.json(
       { error: 'Erro ao baixar relatório' },
       { status: 500 }

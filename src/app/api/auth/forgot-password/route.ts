@@ -19,14 +19,14 @@ export async function POST(request: NextRequest) {
       where: { email: email.toLowerCase() },
     });
 
-    // Por segurança, sempre retornar sucesso mesmo se o email não existir
+    // For security, always return success even if email doesn't exist
     if (!user) {
       return NextResponse.json({
-        message: "Se este email estiver cadastrado, você receberá um link de redefinição",
+        message: "If this email is registered, you will receive a reset link",
       });
     }
 
-    // Verificar se o usuário tem senha (não é apenas OAuth)
+    // Check if user has password (not just OAuth)
     if (!user.password) {
       return NextResponse.json({
         message: "Esta conta utiliza login social (GitHub). Não é possível redefinir senha",

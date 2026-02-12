@@ -2,30 +2,30 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/db';
 
-// POST: Revogar todas as sessões do usuário (exceto a atual)
+// POST: Revoke all user sessions (except current)
 export async function POST(request: Request) {
   try {
     const session = await auth();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
     const { currentSessionToken } = body;
 
-    // Buscar todas as sessões do usuário
+    // Fetch all user sessions
     const userSessions = await prisma.session.findMany({
       where: {
         userId: session.user.id,
       },
     });
 
-    // Filtrar para remover a sessão atual
+    // Filter to remove current session
     const sessionsToRevoke = userSessions.filter(
       (s) => s.sessionToken !== currentSessionToken
     );
 
-    // Deletar todas as outras sessões
+    // Delete all other sessions
     await prisma.session.deleteMany({
       where: {
         userId: session.user.id,
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       },
     });
 
-    // Registrar logs para cada sessão revogada
+    // Register logs for each revoked session
     if (session.user?.id) {
       await Promise.all(
         sessionsToRevoke.map((s) =>

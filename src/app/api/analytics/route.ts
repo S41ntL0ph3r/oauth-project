@@ -64,7 +64,7 @@ export async function GET(request: Request) {
         },
       }),
 
-      // Total de logs de sessão no período
+      // Total session logs in the period
       prisma.sessionLog.count({
         where: {
           createdAt: {
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
         },
       }),
 
-      // Eventos de segurança não resolvidos
+      // Unresolved security events
       prisma.securityEvent.count({
         where: {
           resolved: false,
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
       }),
     ]);
 
-    // Processar dados para gráfico de crescimento
+    // Process data for growth chart
     const userGrowth = [];
     for (let i = days - 1; i >= 0; i--) {
       const date = subDays(new Date(), i);
@@ -100,7 +100,7 @@ export async function GET(request: Request) {
       });
     }
 
-    // Logins por dia
+    // Logins per day
     const loginsByDay = [];
     for (let i = days - 1; i >= 0; i--) {
       const date = subDays(new Date(), i);
@@ -121,7 +121,7 @@ export async function GET(request: Request) {
       });
     }
 
-    // Taxa de verificação de email
+    // Email verification rate
     const verifiedUsers = await prisma.user.count({
       where: { emailVerified: { not: null } },
     });

@@ -2,15 +2,15 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/db';
 
-// GET: Buscar sessões ativas do usuário
+// GET: Fetch active user sessions
 export async function GET() {
   try {
     const session = await auth();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Buscar todas as sessões ativas do usuário
+    // Fetch all active sessions for the user
     const activeSessions = await prisma.session.findMany({
       where: {
         userId: session.user.id,
@@ -23,7 +23,7 @@ export async function GET() {
       },
     });
 
-    // Para cada sessão, buscar o último log correspondente
+    // For each session, fetch the corresponding last log
     const sessionsWithDetails = await Promise.all(
       activeSessions.map(async (sess) => {
         const lastLog = await prisma.sessionLog.findFirst({
@@ -51,20 +51,20 @@ export async function GET() {
 
     return NextResponse.json(sessionsWithDetails);
   } catch (error) {
-    console.error('Erro ao buscar sessões ativas:', error);
+    console.error('Error fetching active sessions:', error);
     return NextResponse.json(
-      { error: 'Erro ao buscar sessões' },
+      { error: 'Error fetching sessions' },
       { status: 500 }
     );
   }
 }
 
-// DELETE: Revogar sessão específica
+// DELETE: Revoke specific session
 export async function DELETE(request: Request) {
   try {
     const session = await auth();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -72,12 +72,12 @@ export async function DELETE(request: Request) {
 
     if (!sessionId) {
       return NextResponse.json(
-        { error: 'sessionId é obrigatório' },
+        { error: 'sessionId is required' },
         { status: 400 }
       );
     }
 
-    // Verificar se a sessão pertence ao usuário
+    // Check if session belongs to user
     const sessionToDelete = await prisma.session.findFirst({
       where: {
         id: sessionId,
@@ -87,12 +87,12 @@ export async function DELETE(request: Request) {
 
     if (!sessionToDelete) {
       return NextResponse.json(
-        { error: 'Sessão não encontrada' },
+        { error: 'Session not found' },
         { status: 404 }
       );
     }
 
-    // Deletar a sessão
+    // Delete session
     await prisma.session.delete({
       where: {
         id: sessionId,
