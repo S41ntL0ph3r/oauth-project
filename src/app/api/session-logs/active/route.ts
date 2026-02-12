@@ -112,11 +112,11 @@ export async function DELETE(request: Request) {
       });
     }
 
-    return NextResponse.json({ message: 'Sessão revogada com sucesso' });
+    return NextResponse.json({ message: 'Session revoked successfully' });
   } catch (error) {
-    console.error('Erro ao revogar sessão:', error);
+    console.error('Error revoking session:', error);
     return NextResponse.json(
-      { error: 'Erro ao revogar sessão' },
+      { error: 'Error revoking session' },
       { status: 500 }
     );
   }

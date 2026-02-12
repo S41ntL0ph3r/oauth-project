@@ -57,9 +57,9 @@ export async function POST(request: Request) {
       revokedCount: sessionsToRevoke.length,
     });
   } catch (error) {
-    console.error('Erro ao revogar todas as sessões:', error);
+    console.error('Error revoking all sessions:', error);
     return NextResponse.json(
-      { error: 'Erro ao revogar sessões' },
+      { error: 'Error revoking sessions' },
       { status: 500 }
     );
   }
