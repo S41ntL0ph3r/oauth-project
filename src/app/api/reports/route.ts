@@ -72,7 +72,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, type, format, filters, groupBy } = body;
+    const { title, description, type, format, parameters } = body;
 
     if (!title || !type || !format) {
       return NextResponse.json(
@@ -81,11 +81,11 @@ export async function POST(request: Request) {
       );
     }
 
-    // Criar registro de relatório
+    // Create report record
     const report = await prisma.report.create({
       data: {
         title,
-        description,
+        description: description || '',
         type,
         format,
         parameters: parameters || {},
@@ -97,10 +97,10 @@ export async function POST(request: Request) {
     // Start generation process (simulated)
     setTimeout(async () => {
       try {
-        await prisma.report.update(
+        await prisma.report.update({
           where: { id: report.id },
           data: { status: 'GENERATING' },
-        );
+        });
 
         // Fetch data based on type
         let reportData: unknown[] = [];

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 
 // Mock transactions - in production, this would come from the database
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.email) {
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
     // For now, returns mocked data
     // In production, you would fetch from localStorage or a database
-    const transactions: any[] = [];
+    const transactions: unknown[] = [];
 
     return NextResponse.json({ transactions });
   } catch (error) {
