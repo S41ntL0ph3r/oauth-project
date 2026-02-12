@@ -24,7 +24,7 @@ export async function GET(request: Request) {
     if (userId) {
       where.userId = userId;
     } else {
-      // Mostrar eventos do próprio usuário
+      // Show user's own events
       where.userId = session.user.id;
     }
 
@@ -71,15 +71,15 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) {
-    console.error('Erro ao buscar eventos de segurança:', error);
+    console.error('Error fetching security events:', error);
     return NextResponse.json(
-      { error: 'Erro ao buscar eventos' },
+      { error: 'Error fetching events' },
       { status: 500 }
     );
   }
 }
 
-// POST: Criar evento de segurança
+// POST: Create security event
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
 
     if (!eventType || !severity || !description) {
       return NextResponse.json(
-        { error: 'eventType, severity e description são obrigatórios' },
+        { error: 'eventType, severity and description are required' },
         { status: 400 }
       );
     }
@@ -114,20 +114,20 @@ export async function POST(request: Request) {
 
     return NextResponse.json(event, { status: 201 });
   } catch (error) {
-    console.error('Erro ao criar evento de segurança:', error);
+    console.error('Error creating security event:', error);
     return NextResponse.json(
-      { error: 'Erro ao criar evento' },
+      { error: 'Error creating event' },
       { status: 500 }
     );
   }
 }
 
-// PATCH: Marcar evento como resolvido
+// PATCH: Mark event as resolved
 export async function PATCH(request: Request) {
   try {
     const session = await auth();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -135,7 +135,7 @@ export async function PATCH(request: Request) {
 
     if (!eventId) {
       return NextResponse.json(
-        { error: 'eventId é obrigatório' },
+        { error: 'eventId is required' },
         { status: 400 }
       );
     }
@@ -153,9 +153,9 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json(event);
   } catch (error) {
-    console.error('Erro ao resolver evento:', error);
+    console.error('Error resolving event:', error);
     return NextResponse.json(
-      { error: 'Erro ao resolver evento' },
+      { error: 'Error resolving event' },
       { status: 500 }
     );
   }

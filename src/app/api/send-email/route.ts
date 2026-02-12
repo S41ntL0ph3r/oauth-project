@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Rate limiting simples em memória (em produção, use Redis)
+// Simple in-memory rate limiting (in production, use Redis)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 function getClientIP(request: NextRequest): string {

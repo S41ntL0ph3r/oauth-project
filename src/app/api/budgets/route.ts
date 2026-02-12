@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: 'Já existe um orçamento para esta categoria neste período' },
+        { error: 'A budget already exists for this category in this period' },
         { status: 400 }
       );
     }

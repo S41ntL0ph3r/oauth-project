@@ -55,8 +55,8 @@ export async function GET(request: NextRequest) {
       console.log('[Audit] User viewed analytics:', user.email);
     });
 
-    // 5. Buscar transações (mock data - substituir com dados reais)
-    // Em produção, buscar do banco de dados:
+    // 5. Fetch transactions (mock data - replace with real data)
+    // In production, fetch from database:
     // const transactions = await prisma.transaction.findMany({
     //   where: {
     //     userId: user.id,
@@ -65,15 +65,15 @@ export async function GET(request: NextRequest) {
     //   }
     // });
 
-    // Mock data para demonstração
+    // Mock data for demonstration
     const mockTransactions = generateMockTransactions(startDate, endDate);
 
-    // 6. Calcular métricas agregadas
+    // 6. Calculate aggregated metrics
     const totalRevenue = mockTransactions.reduce((sum, t) => sum + t.amount, 0);
     const transactionCount = mockTransactions.length;
     const averageTicket = transactionCount > 0 ? totalRevenue / transactionCount : 0;
 
-    // Taxa de crescimento (comparar com período anterior)
+    // Growth rate (compare with previous period)
     const previousStartDate = new Date(startDate);
     previousStartDate.setDate(previousStartDate.getDate() - period);
     const previousEndDate = new Date(startDate);
@@ -84,15 +84,15 @@ export async function GET(request: NextRequest) {
       ? ((totalRevenue - previousRevenue) / previousRevenue) * 100 
       : 0;
 
-    // Média mensal
+    // Monthly average
     const monthsInPeriod = period / 30;
     const monthlyAverage = monthsInPeriod > 0 ? totalRevenue / monthsInPeriod : totalRevenue;
 
-    // 7. Agrupar dados para gráficos
+    // 7. Group data for charts
     const revenueOverTime = groupByDate(mockTransactions);
     const revenueByCategory = groupByCategory(mockTransactions);
 
-    // 8. Retornar apenas dados agregados
+    // 8. Return only aggregated data
     return NextResponse.json({
       overview: {
         totalRevenue,
@@ -118,8 +118,8 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * Funções auxiliares para processamento de dados
- * Em produção, substituir por queries reais ao banco
+ * Helper functions for data processing
+ * In production, replace with real database queries
  */
 
 interface Transaction {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 
-// Mock de transações - em produção, isso viria do banco de dados
+// Mock transactions - in production, this would come from the database
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Por enquanto, retorna dados mockados
-    // Em produção, você buscaria do localStorage ou de um banco de dados
+    // For now, returns mocked data
+    // In production, you would fetch from localStorage or a database
     const transactions: any[] = [];
 
     return NextResponse.json({ transactions });

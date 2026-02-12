@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   try {
     const session = await auth();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -19,11 +19,11 @@ export async function GET(request: Request) {
 
     const where: Record<string, unknown> = {};
 
-    // Se userId for fornecido, filtrar por usuário específico
+    // If userId is provided, filter by specific user
     if (userId) {
       where.userId = userId;
     } else {
-      // Caso contrário, mostrar apenas os logs do usuário logado
+      // Otherwise, show only the logged-in user's logs
       where.userId = session.user.id;
     }
 
@@ -118,14 +118,14 @@ export async function POST(request: Request) {
       },
     });
 
-    // Se for tentativa de login falhada, criar evento de segurança
+    // If it's a failed login attempt, create security event
     if (action === 'login' && !success) {
       await prisma.securityEvent.create({
         data: {
           userId,
           eventType: 'FAILED_LOGIN',
           severity: 'LOW',
-          description: `Tentativa de login falhada: ${failReason || 'Credenciais inválidas'}`,
+          description: `Failed login attempt: ${failReason || 'Invalid credentials'}`,
           ipAddress,
           userAgent,
           metadata: { logId: log.id },
