@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import prisma from '@/lib/db';
+import { requireAuthenticatedUser } from '@/server/auth/user-session';
+import { withApiHandler } from '@/server/http/route';
+import { analyticsService } from '@/services/analytics/analyticsService';
 
 /**
  * API: Revenue Analytics
@@ -17,20 +19,8 @@ import prisma from '@/lib/db';
  */
 
 export async function GET(request: NextRequest) {
-  try {
-    // 1. Autenticação
-    const session = await auth();
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+  return withApiHandler(async () => {
+    const user = await requireAuthenticatedUser();
 
     // 2. Parâmetros
     const { searchParams } = new URL(request.url);
@@ -41,7 +31,6 @@ export async function GET(request: NextRequest) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - period);
 
-    // 4. Log de auditoria (LGPD Art. 37)
     await prisma.auditLog.create({
       data: {
         userId: user.id,
@@ -51,8 +40,16 @@ export async function GET(request: NextRequest) {
         timestamp: new Date()
       }
     }).catch(() => {
-      // Se tabela não existir, apenas log no console
       console.log('[Audit] User viewed analytics:', user.email);
+    });
+
+    await analyticsService.captureServerEvent({
+      event: 'financial_chart_viewed',
+      distinctId: user.id,
+      properties: {
+        period,
+        chart: 'revenue',
+      },
     });
 
     // 5. Fetch transactions (mock data - replace with real data)
@@ -92,8 +89,7 @@ export async function GET(request: NextRequest) {
     const revenueOverTime = groupByDate(mockTransactions);
     const revenueByCategory = groupByCategory(mockTransactions);
 
-    // 8. Return only aggregated data
-    return NextResponse.json({
+    return {
       overview: {
         totalRevenue,
         monthlyAverage,
@@ -106,15 +102,8 @@ export async function GET(request: NextRequest) {
         revenueOverTime,
         revenueByCategory
       }
-    });
-
-  } catch (error) {
-    console.error('Error fetching revenue analytics:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
+    };
+  });
 }
 
 /**

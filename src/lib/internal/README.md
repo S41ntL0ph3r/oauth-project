@@ -4,7 +4,7 @@ Esta pasta contém arquivos que são **apenas para uso interno** do sistema e **
 
 ## Conteúdo
 
-- `emailjs-config.tsx` - Componente de configuração do EmailJS (removido da interface de usuário)
+- Integrações administrativas e documentação interna sensível
 
 ## ⚠️ Importante
 
@@ -12,6 +12,6 @@ Estes arquivos contêm configurações sensíveis e funcionalidades administrati
 
 ## Segurança
 
-- ✅ Configurações do EmailJS mantidas apenas no backend
+- ✅ Configurações de email centralizadas no backend via Brevo
 - ✅ Interface de usuário limpa sem exposição de configurações técnicas
 - ✅ Separação clara entre funcionalidades internas e externas

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { Session } from '@prisma/client';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/db';
 
@@ -18,11 +19,11 @@ export async function POST(request: Request) {
       where: {
         userId: session.user.id,
       },
-    });
+    }) as Session[];
 
     // Filter to remove current session
     const sessionsToRevoke = userSessions.filter(
-      (s) => s.sessionToken !== currentSessionToken
+      (s: Session) => s.sessionToken !== currentSessionToken
     );
 
     // Delete all other sessions
@@ -38,7 +39,7 @@ export async function POST(request: Request) {
     // Register logs for each revoked session
     if (session.user?.id) {
       await Promise.all(
-        sessionsToRevoke.map((s) =>
+        sessionsToRevoke.map((s: Session) =>
           prisma.sessionLog.create({
             data: {
               userId: session.user!.id!,

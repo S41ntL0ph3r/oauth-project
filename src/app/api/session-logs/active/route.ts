@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { Session } from '@prisma/client';
 import { auth } from '@/lib/auth';
 import prisma from '@/lib/db';
 
@@ -25,7 +26,7 @@ export async function GET() {
 
     // For each session, fetch the corresponding last log
     const sessionsWithDetails = await Promise.all(
-      activeSessions.map(async (sess) => {
+      activeSessions.map(async (sess: Session) => {
         const lastLog = await prisma.sessionLog.findFirst({
           where: {
             userId: session.user?.id || '',

@@ -24,7 +24,7 @@ A **complete and modern authentication system** with professional admin panel. B
 ### ✨ **System Highlights**
 - 🔐 **Hybrid Authentication** - OAuth (GitHub) + Local credentials
 - 🛡️ **Complete Admin Panel** - User, product, and permission management
-- 📧 **Email System** - Verification and recovery via EmailJS
+- 📧 **Email System** - Verification and recovery via Brevo
 - 🔒 **Advanced Security** - JWT, bcrypt, rate limiting, XSS protection
 - 🎨 **Modern Interface** - Responsive design with dark/light mode
 - ⚡ **Optimized Performance** - Next.js 15 App Router with TypeScript
@@ -40,7 +40,7 @@ A **complete and modern authentication system** with professional admin panel. B
 ### 👤 **User Authentication**
 - 🔑 **OAuth Login with GitHub** - Native and secure integration
 - 📝 **Credential Registration** - Email and password with validation
-- ✅ **Email Verification** - Secure links via EmailJS
+- ✅ **Email Verification** - Secure links via Brevo
 - 🔐 **Persistent JWT Sessions** - NextAuth v5 with Prisma
 - � **Password Recovery** - Secure temporary tokens
 

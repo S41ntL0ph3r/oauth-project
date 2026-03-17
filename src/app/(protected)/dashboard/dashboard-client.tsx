@@ -4,6 +4,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import useLocalStorage from '@/hooks/useLocalStorage';
 import useDataExport from '@/hooks/useDataExport';
+import { useEventTracking } from '@/hooks/use-event-tracking';
 
 // Tipos
 type TransactionType = 'income' | 'expense';
@@ -37,6 +38,7 @@ type ActiveTab = 'overview' | 'transactions' | 'payments' | 'activities' | 'sett
 const DashboardClient: React.FC = () => {
   const { data: session } = useSession();
   const { exportToCSV, exportToPDF } = useDataExport();
+  const { capture, events } = useEventTracking();
   
   // Estados principais com localStorage
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>('dashboard-transactions', []);
@@ -52,6 +54,14 @@ const DashboardClient: React.FC = () => {
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    capture(events.dashboardOpened, {
+      transactionCount: transactions.length,
+      paymentCount: payments.length,
+      hasSession: Boolean(session?.user),
+    });
+  }, [capture, events.dashboardOpened, payments.length, session?.user, transactions.length]);
   
   // Estados dos modais
   const [showAddTransaction, setShowAddTransaction] = useState(false);
@@ -132,6 +142,13 @@ const DashboardClient: React.FC = () => {
     };
 
     setActivities(prev => [newActivity, ...prev]);
+
+    if (newTransaction.type === 'expense') {
+      capture(events.expenseAdded, {
+        category: newTransaction.category,
+        amount: newTransaction.amount,
+      });
+    }
 
     setTransactionForm({
       description: '',
@@ -252,6 +269,13 @@ const DashboardClient: React.FC = () => {
     };
 
     setActivities(prev => [deleteActivity, ...prev]);
+
+    if (transactionToDelete.type === 'expense') {
+      capture(events.expenseDeleted, {
+        category: transactionToDelete.category,
+        amount: transactionToDelete.amount,
+      });
+    }
     
     // Limpar estado
     setTransactionToDelete(null);
@@ -310,6 +334,11 @@ const DashboardClient: React.FC = () => {
     console.log('Resultado exportToCSV:', result);
     
     if (result.success) {
+      capture(events.featureVisited, {
+        feature: 'dashboard-export-csv',
+        transactions: data.summary.totalTransactions,
+        payments: data.summary.totalPayments,
+      });
       const exportActivity: Activity = {
         id: generateUniqueId(),
         description: 'Dados exportados em formato CSV',
@@ -332,6 +361,11 @@ const DashboardClient: React.FC = () => {
     console.log('Resultado exportToPDF:', result);
     
     if (result.success) {
+      capture(events.featureVisited, {
+        feature: 'dashboard-export-pdf',
+        transactions: data.summary.totalTransactions,
+        payments: data.summary.totalPayments,
+      });
       const exportActivity: Activity = {
         id: generateUniqueId(),
         description: 'Dados exportados em formato PDF',
@@ -1136,6 +1170,7 @@ const DashboardClient: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
                 <input
+                  title="Descrição da transação"
                   type="text"
                   value={transactionForm.description}
                   onChange={(e) => setTransactionForm(prev => ({ ...prev, description: e.target.value }))}
@@ -1146,6 +1181,7 @@ const DashboardClient: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor</label>
                   <input
+                    title="Valor da transação"
                     type="number"
                     step="0.01"
                     value={transactionForm.amount}
@@ -1156,6 +1192,7 @@ const DashboardClient: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tipo</label>
                   <select
+                    title="Tipo da transação"
                     value={transactionForm.type}
                     onChange={(e) => setTransactionForm(prev => ({ ...prev, type: e.target.value as TransactionType }))}
                     className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -1169,6 +1206,7 @@ const DashboardClient: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
                   <select
+                    title="Categoria da transação"
                     value={transactionForm.category}
                     onChange={(e) => setTransactionForm(prev => ({ ...prev, category: e.target.value }))}
                     className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -1184,6 +1222,7 @@ const DashboardClient: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data</label>
                   <input
+                    title="Data da transação"
                     type="date"
                     value={transactionForm.date}
                     onChange={(e) => setTransactionForm(prev => ({ ...prev, date: e.target.value }))}
@@ -1219,6 +1258,7 @@ const DashboardClient: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
                 <input
+                  title="Descrição do pagamento"
                   type="text"
                   value={paymentForm.description}
                   onChange={(e) => setPaymentForm(prev => ({ ...prev, description: e.target.value }))}
@@ -1229,6 +1269,7 @@ const DashboardClient: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor</label>
                   <input
+                    title="Valor do pagamento"
                     type="number"
                     step="0.01"
                     value={paymentForm.amount}
@@ -1239,6 +1280,7 @@ const DashboardClient: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data de Vencimento</label>
                   <input
+                    title="Data de vencimento do pagamento"
                     type="date"
                     value={paymentForm.dueDate}
                     onChange={(e) => setPaymentForm(prev => ({ ...prev, dueDate: e.target.value }))}
@@ -1274,6 +1316,7 @@ const DashboardClient: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Descrição</label>
                 <input
+                  title="Descrição do pagamento"
                   type="text"
                   value={editingPayment.description}
                   onChange={(e) => setEditingPayment(prev => prev ? ({ ...prev, description: e.target.value }) : null)}
@@ -1284,6 +1327,7 @@ const DashboardClient: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Valor</label>
                   <input
+                    title="Valor do pagamento"
                     type="number"
                     step="0.01"
                     value={editingPayment.amount}
@@ -1294,6 +1338,7 @@ const DashboardClient: React.FC = () => {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data de Vencimento</label>
                   <input
+                    title="Data de vencimento do pagamento"
                     type="date"
                     value={editingPayment.dueDate}
                     onChange={(e) => setEditingPayment(prev => prev ? ({ ...prev, dueDate: e.target.value }) : null)}
@@ -1304,6 +1349,7 @@ const DashboardClient: React.FC = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                 <select
+                  title="Status do pagamento"
                   value={editingPayment.status}
                   onChange={(e) => setEditingPayment(prev => prev ? ({ ...prev, status: e.target.value as Payment['status'] }) : null)}
                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -1434,6 +1480,8 @@ const DashboardClient: React.FC = () => {
               </h3>
               <button
                 onClick={() => setShowExportModal(false)}
+                title="Fechar modal de exportação"
+                aria-label="Fechar modal de exportação"
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

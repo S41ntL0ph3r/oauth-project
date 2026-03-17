@@ -4,6 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { compare } from "bcrypt";
 import db from "./db";
+import { env } from '@/config/env';
 
 export const {
   handlers,
@@ -23,8 +24,8 @@ export const {
   trustHost: true,
   providers: [
     GitHub({
-      clientId: process.env.AUTH_GITHUB_ID!,
-      clientSecret: process.env.AUTH_GITHUB_SECRET!,
+      clientId: env.github.clientId!,
+      clientSecret: env.github.clientSecret!,
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -73,7 +74,7 @@ export const {
       return session;
     },
   },
-  debug: process.env.NODE_ENV === "development",
+  debug: env.isDevelopment,
 });
 
 export const { GET, POST } = handlers;

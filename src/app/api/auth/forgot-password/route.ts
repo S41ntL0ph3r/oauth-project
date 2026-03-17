@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomBytes, createHash } from "crypto";
-import db from "@/lib/db";
-import { sendPasswordResetEmail } from "@/lib/emailjs";
+import { userRepository } from '@/server/repositories/user-repository';
+import { emailService } from '@/services/email/emailService';
+import { withApiHandler } from '@/server/http/route';
 
 export async function POST(request: NextRequest) {
-  try {
+  return withApiHandler(async () => {
     const { email } = await request.json();
 
     if (!email) {
@@ -14,60 +15,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verificar se o usuário existe
-    const user = await db.user.findUnique({
-      where: { email: email.toLowerCase() },
-    });
+    const user = await userRepository.findByEmail(email);
 
-    // For security, always return success even if email doesn't exist
     if (!user) {
-      return NextResponse.json({
+      return {
         message: "If this email is registered, you will receive a reset link",
-      });
+      };
     }
 
-    // Check if user has password (not just OAuth)
     if (!user.password) {
       return NextResponse.json({
         message: "Esta conta utiliza login social (GitHub). Não é possível redefinir senha",
       }, { status: 400 });
     }
 
-    // Invalidar tokens anteriores
-    await db.passwordResetToken.updateMany({
-      where: {
-        email: email.toLowerCase(),
-        used: false,
-        expires: { gt: new Date() },
-      },
-      data: { used: true },
-    });
+    await userRepository.invalidateActivePasswordResetTokens(email);
 
-    // SEGURANÇA: Gerar token e hashear antes de salvar
     const rawToken = randomBytes(32).toString("hex");
     const tokenHash = createHash('sha256').update(rawToken).digest('hex');
-    const expires = new Date(Date.now() + 3600000); // 1 hora
+    const expires = new Date(Date.now() + 3600000);
 
-    // Salvar hash do token no banco (não o token em si)
-    await db.passwordResetToken.create({
-      data: {
-        email: email.toLowerCase(),
-        token: tokenHash, // Salvamos o hash, não o token original
-        expires,
-      },
+    await userRepository.createPasswordResetToken({
+      email,
+      token: tokenHash,
+      expires,
     });
-    
-    // Enviar o token original por email (não o hash)
-    await sendPasswordResetEmail(email, rawToken);
 
-    return NextResponse.json({
+    await emailService.sendPasswordResetEmail(email, rawToken);
+
+    return {
       message: "Se este email estiver cadastrado, você receberá um link de redefinição",
-    });
-  } catch (error) {
-    console.error("Erro ao processar solicitação de redefinição:", error);
-    return NextResponse.json(
-      { error: "Erro interno do servidor" },
-      { status: 500 }
-    );
-  }
+    };
+  });
 }

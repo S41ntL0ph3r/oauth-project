@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
 import prisma from '@/lib/db';
 import { startOfDay, endOfDay, subDays, format } from 'date-fns';
+import { requireAuthenticatedUser } from '@/server/auth/user-session';
+import { withApiHandler, apiResponse } from '@/server/http/route';
+import { analyticsService } from '@/services/analytics/analyticsService';
 
 export async function GET(request: Request) {
-  try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  return withApiHandler(async () => {
+    await requireAuthenticatedUser();
 
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || '7'; // days
@@ -31,7 +30,7 @@ export async function GET(request: Request) {
         },
       });
 
-      return NextResponse.json(data);
+      return data;
     }
 
     // Fetch all metrics for the period
@@ -166,7 +165,7 @@ export async function GET(request: Request) {
       take: 5,
     });
 
-    return NextResponse.json({
+    return {
       overview: {
         totalUsers,
         newUsersToday,
@@ -180,57 +179,45 @@ export async function GET(request: Request) {
         loginsByDay,
       },
       demographics: {
-        devices: topDevices.map(d => ({
+        devices: topDevices.map((d: { device: string | null; _count: number | { device?: number } }) => ({
           name: d.device || 'Unknown',
-          value: d._count,
+          value: typeof d._count === 'number' ? d._count : (d._count.device ?? 0),
         })),
-        browsers: topBrowsers.map(b => ({
+        browsers: topBrowsers.map((b: { browser: string | null; _count: number | { browser?: number } }) => ({
           name: b.browser || 'Unknown',
-          value: b._count,
+          value: typeof b._count === 'number' ? b._count : (b._count.browser ?? 0),
         })),
       },
-    });
-  } catch (error) {
-    console.error('Error fetching analytics:', error);
-    return NextResponse.json(
-      { error: 'Error fetching metrics' },
-      { status: 500 }
-    );
-  }
+    };
+  });
 }
 
 // POST: Registrar métrica personalizada
 export async function POST(request: Request) {
-  try {
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+  return withApiHandler(async () => {
+    const user = await requireAuthenticatedUser();
 
     const body = await request.json();
     const { metric, value, metadata } = body;
 
     if (!metric || value === undefined) {
-      return NextResponse.json(
+      return apiResponse(
         { error: 'Metric and value are required' },
-        { status: 400 }
+        400,
       );
     }
 
-    const analytics = await prisma.analytics.create({
-      data: {
+    const analytics = await analyticsService.recordMetric(metric, parseFloat(value), metadata || {});
+
+    await analyticsService.captureServerEvent({
+      event: 'feature_visited',
+      distinctId: user.id,
+      properties: {
         metric,
         value: parseFloat(value),
-        metadata: metadata || {},
       },
     });
 
-    return NextResponse.json(analytics, { status: 201 });
-  } catch (error) {
-    console.error('Error creating metric:', error);
-    return NextResponse.json(
-      { error: 'Error creating metric' },
-      { status: 500 }
-    );
-  }
+    return apiResponse(analytics, 201);
+  });
 }

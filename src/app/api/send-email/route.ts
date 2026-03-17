@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { RateLimitError } from '@/server/errors/app-error';
+import { withApiHandler, apiResponse } from '@/server/http/route';
+import { emailService } from '@/services/email/emailService';
 
 // Simple in-memory rate limiting (in production, use Redis)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -33,86 +36,27 @@ interface SendEmailRequest {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    // SEGURANÇA: Rate limiting rigoroso para prevenir spam
+  return withApiHandler(async () => {
     const clientIP = getClientIP(request);
     const ipLimit = checkRateLimit(`email:ip:${clientIP}`, 5, 60 * 60 * 1000); // 5 por hora por IP
     
     if (!ipLimit.allowed) {
-      return NextResponse.json(
-        { 
-          error: 'Limite de envio de emails atingido. Tente novamente mais tarde.',
-          resetTime: ipLimit.resetTime 
-        },
-        { status: 429 }
-      );
+      throw new RateLimitError('Limite de envio de emails atingido. Tente novamente mais tarde.', {
+        resetTime: ipLimit.resetTime,
+      });
     }
     
     const { type, email, token }: SendEmailRequest = await request.json();
 
     if (!type || !email || !token) {
-      return NextResponse.json(
-        { error: 'Dados obrigatórios: type, email, token' },
-        { status: 400 }
-      );
+      return apiResponse({ error: 'Dados obrigatórios: type, email, token' }, 400);
     }
 
-    // Aqui as chaves ficam no servidor (mais seguro)
-    const serviceId = process.env.EMAILJS_SERVICE_ID; // Sem NEXT_PUBLIC_
-    const templateId = type === 'reset' 
-      ? process.env.EMAILJS_TEMPLATE_RESET_PASSWORD
-      : process.env.EMAILJS_TEMPLATE_VERIFY_EMAIL;
-    const publicKey = process.env.EMAILJS_PUBLIC_KEY;
+    const result = type === 'reset'
+      ? await emailService.sendPasswordResetEmail(email, token)
+      : await emailService.sendVerificationEmail(email, token);
 
-    if (!serviceId || !templateId || !publicKey) {
-      return NextResponse.json(
-        { error: 'Configuração EmailJS incompleta' },
-        { status: 500 }
-      );
-    }
-
-    const resetLink = type === 'reset' 
-      ? `${process.env.NEXTAUTH_URL}/reset-password?token=${token}`
-      : `${process.env.NEXTAUTH_URL}/api/auth/verify?token=${token}`;
-
-    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        service_id: serviceId,
-        template_id: templateId,
-        user_id: publicKey,
-        template_params: {
-          to_email: email,
-          email: email,
-          link: resetLink,
-          user_name: email.split('@')[0],
-          app_name: 'OAuth Project',
-          from_name: 'OAuth Project Team',
-          subject: type === 'reset' ? 'Reset de Senha' : 'Verificar Email',
-          message: type === 'reset' ? 'Link para resetar sua senha' : 'Link para verificar seu email',
-        },
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('EmailJS API erro:', errorText);
-      return NextResponse.json(
-        { error: 'Erro ao enviar email' },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ success: true });
-
-  } catch (error) {
-    console.error('Erro no endpoint de email:', error);
-    return NextResponse.json(
-      { error: 'Erro interno do servidor' },
-      { status: 500 }
-    );
-  }
+    emailService.assertSuccess(result, 'Erro ao enviar email');
+    return { success: true, provider: result.provider };
+  });
 }

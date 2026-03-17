@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import { Metadata } from "next";
 import { SessionProvider } from "../components/session-provider";
+import { AnalyticsProvider } from "../components/analytics-provider";
 import { ThemeProvider } from "../contexts/theme-context";
 import { auth } from "@/lib/auth";
 import ServiceWorkerProvider from "../components/service-worker-provider";
@@ -26,9 +27,11 @@ export default async function RootLayout({
       <body className={inter.className}>
         <ThemeProvider>
           <SessionProvider session={session}>
-            <ServiceWorkerProvider>
-              {children}
-            </ServiceWorkerProvider>
+            <AnalyticsProvider>
+              <ServiceWorkerProvider>
+                {children}
+              </ServiceWorkerProvider>
+            </AnalyticsProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>

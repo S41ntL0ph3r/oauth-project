@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { withApiHandler, apiResponse } from '@/server/http/route';
+import { emailService } from '@/services/email/emailService';
 
 export async function POST(request: NextRequest) {
-  try {
-    // SEGURANÇA: Apenas usuários autenticados ou ambiente de desenvolvimento
+  return withApiHandler(async () => {
     if (process.env.NODE_ENV === 'production') {
       const session = await auth();
       
@@ -15,32 +16,18 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    const { email, serviceId, templateId, publicKey } = await request.json();
+    const { email, subject, message } = await request.json();
 
-    if (!email || !serviceId || !templateId || !publicKey) {
-      return NextResponse.json(
-        { error: "Todos os campos são obrigatórios" },
-        { status: 400 }
-      );
+    if (!email) {
+      return apiResponse({ error: "Email é obrigatório" }, 400);
     }
 
-    // Simular o envio do email usando EmailJS no frontend
-    // Esta API é apenas para validação, o envio real acontece no frontend
-    
-    return NextResponse.json({
-      message: "Configuração válida! O email será enviado pelo frontend.",
-      config: {
-        serviceId,
-        templateId,
-        publicKey: publicKey.substring(0, 8) + "...", // Mostrar apenas parte da chave
-        email
-      }
-    });
-  } catch (error) {
-    console.error("Erro ao testar configuração EmailJS:", error);
-    return NextResponse.json(
-      { error: "Erro interno do servidor" },
-      { status: 500 }
-    );
-  }
+    const result = await emailService.sendTestEmail(email, subject, message);
+    emailService.assertSuccess(result, 'Falha no envio do email de teste');
+
+    return {
+      message: 'Email de teste enviado com sucesso.',
+      provider: result.provider,
+    };
+  });
 }
