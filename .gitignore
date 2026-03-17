@@ -90,7 +90,6 @@ logs/
 pnpm-debug.log*
 
 # Email configurações sensíveis (SENSÍVEL)
-/src/lib/internal/emailjs-config.tsx
 /lib/email-config.*
 /config/email.*
 smtp-config.*
@@ -252,7 +251,6 @@ storybook-static/
 IMPLEMENTATION_SUMMARY.md
 NEW_FEATURES.md
 API_EXAMPLES.md
-EMAILJS_TEMPLATES.md
 setup-neon.md
 script.md
 SECURITY.md

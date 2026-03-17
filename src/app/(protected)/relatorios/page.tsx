@@ -51,6 +51,20 @@ const CATEGORIES = [
   'Outros'
 ];
 
+const BAR_WIDTH_CLASSES = [
+  'w-0',
+  'w-[10%]',
+  'w-[20%]',
+  'w-[30%]',
+  'w-[40%]',
+  'w-1/2',
+  'w-[60%]',
+  'w-[70%]',
+  'w-[80%]',
+  'w-[90%]',
+  'w-full',
+];
+
 export default function RelatoriosPage() {
   const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -72,6 +86,12 @@ export default function RelatoriosPage() {
     name: '',
     description: ''
   });
+
+  const getBarWidthClass = (percentage: number) => {
+    const safePercentage = Math.max(0, Math.min(100, percentage));
+    const classIndex = Math.round(safePercentage / 10);
+    return BAR_WIDTH_CLASSES[classIndex] || 'w-0';
+  };
 
   useEffect(() => {
     loadSavedReports();
@@ -286,6 +306,7 @@ export default function RelatoriosPage() {
                   Tipo de Relatório
                 </label>
                 <select
+                  title="Tipo de relatório"
                   value={filters.reportType}
                   onChange={(e) => setFilters(prev => ({ ...prev, reportType: e.target.value }))}
                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -300,6 +321,7 @@ export default function RelatoriosPage() {
                   Data Inicial
                 </label>
                 <input
+                  title="Data inicial do relatório"
                   type="date"
                   value={filters.startDate}
                   onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
@@ -311,6 +333,7 @@ export default function RelatoriosPage() {
                   Data Final
                 </label>
                 <input
+                  title="Data final do relatório"
                   type="date"
                   value={filters.endDate}
                   onChange={(e) => setFilters(prev => ({ ...prev, endDate: e.target.value }))}
@@ -322,6 +345,7 @@ export default function RelatoriosPage() {
                   Categoria
                 </label>
                 <select
+                  title="Categoria do relatório"
                   value={filters.category}
                   onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -336,6 +360,7 @@ export default function RelatoriosPage() {
                   Tipo de Transação
                 </label>
                 <select
+                  title="Tipo de transação"
                   value={filters.transactionType}
                   onChange={(e) => setFilters(prev => ({ ...prev, transactionType: e.target.value }))}
                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -350,6 +375,7 @@ export default function RelatoriosPage() {
                   Valor Mínimo
                 </label>
                 <input
+                  title="Valor mínimo"
                   type="number"
                   step="0.01"
                   value={filters.minAmount}
@@ -363,6 +389,7 @@ export default function RelatoriosPage() {
                   Valor Máximo
                 </label>
                 <input
+                  title="Valor máximo"
                   type="number"
                   step="0.01"
                   value={filters.maxAmount}
@@ -498,8 +525,7 @@ export default function RelatoriosPage() {
                             </div>
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                               <div
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${percentage}%` }}
+                                className={`bg-blue-600 h-2 rounded-full transition-all duration-300 ${getBarWidthClass(percentage)}`}
                               />
                             </div>
                           </div>

@@ -383,6 +383,7 @@ export default function NotificationsPage() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
+                title="Ativar ou desativar alertas de orçamento"
                 type="checkbox"
                 checked={alertSettings.budgetAlerts}
                 onChange={(e) => updateSettings({ ...alertSettings, budgetAlerts: e.target.checked })}
@@ -401,6 +402,7 @@ export default function NotificationsPage() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
+                title="Ativar ou desativar lembretes de pagamento"
                 type="checkbox"
                 checked={alertSettings.paymentReminders}
                 onChange={(e) => updateSettings({ ...alertSettings, paymentReminders: e.target.checked })}
@@ -419,6 +421,7 @@ export default function NotificationsPage() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
+                title="Ativar ou desativar resumo semanal"
                 type="checkbox"
                 checked={alertSettings.weeklyReports}
                 onChange={(e) => updateSettings({ ...alertSettings, weeklyReports: e.target.checked })}
@@ -437,6 +440,7 @@ export default function NotificationsPage() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
+                title="Ativar ou desativar resumo mensal"
                 type="checkbox"
                 checked={alertSettings.monthlyReports}
                 onChange={(e) => updateSettings({ ...alertSettings, monthlyReports: e.target.checked })}
@@ -455,6 +459,7 @@ export default function NotificationsPage() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
+                title="Ativar ou desativar alertas de segurança"
                 type="checkbox"
                 checked={alertSettings.securityAlerts}
                 onChange={(e) => updateSettings({ ...alertSettings, securityAlerts: e.target.checked })}
@@ -473,6 +478,7 @@ export default function NotificationsPage() {
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
+                title="Ativar ou desativar notificações por email"
                 type="checkbox"
                 checked={alertSettings.emailNotifications}
                 onChange={(e) => updateSettings({ ...alertSettings, emailNotifications: e.target.checked })}

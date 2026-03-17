@@ -14,6 +14,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { LoadingSpinner } from '@/components/loading-spinner';
+import { useEventTracking } from '@/hooks/use-event-tracking';
 
 /**
  * Analytics Page - Métricas de Faturamento
@@ -53,6 +54,7 @@ export default function AnalyticsPage() {
   const [data, setData] = useState<RevenueAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('30');
+  const { capture, events } = useEventTracking();
 
   const fetchAnalytics = useCallback(async () => {
     try {
@@ -78,6 +80,16 @@ export default function AnalyticsPage() {
   useEffect(() => {
     fetchAnalytics();
   }, [fetchAnalytics]);
+
+  useEffect(() => {
+    if (!loading && data) {
+      capture(events.financialChartViewed, {
+        chart: 'revenue',
+        period,
+        transactionCount: data.overview.transactionCount,
+      });
+    }
+  }, [capture, data, events.financialChartViewed, loading, period]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -229,7 +241,7 @@ export default function AnalyticsPage() {
                 border: '1px solid #e5e7eb',
                 borderRadius: '8px'
               }}
-              formatter={(value: number) => [formatCurrency(value), 'Receita']}
+              formatter={(value: number | undefined) => [formatCurrency(value || 0), 'Receita']}
             />
             <Legend />
             <Line 
@@ -269,7 +281,7 @@ export default function AnalyticsPage() {
                 border: '1px solid #e5e7eb',
                 borderRadius: '8px'
               }}
-              formatter={(value: number) => [formatCurrency(value), 'Receita']}
+              formatter={(value: number | undefined) => [formatCurrency(value || 0), 'Receita']}
             />
             <Legend />
             <Bar 

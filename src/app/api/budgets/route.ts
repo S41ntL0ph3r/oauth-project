@@ -1,108 +1,73 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import prisma from '@/lib/db';
+import { requireAuthenticatedUser } from '@/server/auth/user-session';
+import { budgetRepository } from '@/server/repositories/budget-repository';
+import { withApiHandler, apiResponse } from '@/server/http/route';
+import { analyticsService } from '@/services/analytics/analyticsService';
 
 export async function GET(request: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+  return withApiHandler(async () => {
+    const user = await requireAuthenticatedUser();
 
     const { searchParams } = new URL(request.url);
     const month = searchParams.get('month');
     const year = searchParams.get('year');
 
-    const where: { userId: string; month?: number; year?: number } = { userId: user.id };
+    const budgets = await budgetRepository.findManyByUser(
+      user.id,
+      month ? parseInt(month) : undefined,
+      year ? parseInt(year) : undefined,
+    );
 
-    if (month && year) {
-      where.month = parseInt(month);
-      where.year = parseInt(year);
-    }
-
-    const budgets = await prisma.budget.findMany({
-      where,
-      include: {
-        alerts: {
-          where: { isRead: false },
-          orderBy: { createdAt: 'desc' }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
-
-    return NextResponse.json({ budgets });
-  } catch (error) {
-    console.error('Error fetching budgets:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+    return { budgets };
+  });
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+  return withApiHandler(async () => {
+    const user = await requireAuthenticatedUser();
 
     const body = await request.json();
     const { name, category, limitAmount, alertThreshold, month, year } = body;
 
-    // Validações
     if (!name || !category || !limitAmount || !month || !year) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+      return apiResponse({ error: 'Missing required fields' }, 400);
     }
 
-    // Verificar se já existe orçamento para essa categoria/mês/ano
-    const existing = await prisma.budget.findUnique({
-      where: {
-        userId_category_month_year: {
-          userId: user.id,
-          category,
-          month: parseInt(month),
-          year: parseInt(year)
-        }
-      }
-    });
+    const existing = await budgetRepository.findExistingPeriodBudget(
+      user.id,
+      category,
+      parseInt(month),
+      parseInt(year),
+    );
 
     if (existing) {
-      return NextResponse.json(
+      return apiResponse(
         { error: 'A budget already exists for this category in this period' },
-        { status: 400 }
+        400,
       );
     }
 
-    const budget = await prisma.budget.create({
-      data: {
-        userId: user.id,
-        name,
-        category,
-        limitAmount: parseFloat(limitAmount),
-        alertThreshold: parseFloat(alertThreshold) || 80,
-        month: parseInt(month),
-        year: parseInt(year)
-      }
+    const budget = await budgetRepository.create({
+      userId: user.id,
+      name,
+      category,
+      limitAmount: parseFloat(limitAmount),
+      alertThreshold: parseFloat(alertThreshold) || 80,
+      month: parseInt(month),
+      year: parseInt(year),
     });
 
-    return NextResponse.json({ budget }, { status: 201 });
-  } catch (error) {
-    console.error('Error creating budget:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+    await analyticsService.captureServerEvent({
+      event: 'budget_created',
+      distinctId: user.id,
+      properties: {
+        category,
+        month: parseInt(month),
+        year: parseInt(year),
+        limitAmount: parseFloat(limitAmount),
+      },
+    });
+
+    return apiResponse({ budget }, 201);
+  });
 }

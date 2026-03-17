@@ -390,6 +390,7 @@ export default function ReportsPage() {
                   Tipo de Relatório *
                 </label>
                 <select
+                  title="Tipo de relatório"
                   value={formData.type}
                   onChange={(e) =>
                     setFormData({ ...formData, type: e.target.value })
@@ -410,6 +411,7 @@ export default function ReportsPage() {
                   Formato de Exportação *
                 </label>
                 <select
+                  title="Formato de exportação"
                   value={formData.format}
                   onChange={(e) =>
                     setFormData({ ...formData, format: e.target.value })

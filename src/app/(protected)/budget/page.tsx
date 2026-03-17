@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useEventTracking } from '@/hooks/use-event-tracking';
 
 interface Budget {
   id: string;
@@ -41,6 +42,30 @@ const MONTHS = [
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
 ];
 
+const PROGRESS_WIDTH_CLASSES = [
+  'w-0',
+  'w-[5%]',
+  'w-[10%]',
+  'w-[15%]',
+  'w-[20%]',
+  'w-[25%]',
+  'w-[30%]',
+  'w-[35%]',
+  'w-[40%]',
+  'w-[45%]',
+  'w-1/2',
+  'w-[55%]',
+  'w-[60%]',
+  'w-[65%]',
+  'w-[70%]',
+  'w-3/4',
+  'w-[80%]',
+  'w-[85%]',
+  'w-[90%]',
+  'w-[95%]',
+  'w-full',
+];
+
 export default function BudgetPage() {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -61,6 +86,7 @@ export default function BudgetPage() {
     month: currentDate.getMonth() + 1,
     year: currentDate.getFullYear()
   });
+  const { capture, events } = useEventTracking();
 
   // Carregar budgets e transações
   const loadData = useCallback(async () => {
@@ -89,6 +115,14 @@ export default function BudgetPage() {
   useEffect(() => {
     loadData();
   }, [selectedMonth, selectedYear, loadData]);
+
+  useEffect(() => {
+    capture(events.featureVisited, {
+      feature: 'budget',
+      month: selectedMonth,
+      year: selectedYear,
+    });
+  }, [capture, events.featureVisited, selectedMonth, selectedYear]);
 
   // Calcular gastos por categoria
   const spendingByCategory = useMemo(() => {
@@ -132,6 +166,12 @@ export default function BudgetPage() {
 
       if (response.ok) {
         await loadData();
+        capture(events.budgetCreated, {
+          category: budgetForm.category,
+          limitAmount: parseFloat(budgetForm.limitAmount),
+          month: budgetForm.month,
+          year: budgetForm.year,
+        });
         setShowAddModal(false);
         setBudgetForm({
           name: '',
@@ -163,6 +203,11 @@ export default function BudgetPage() {
 
       if (response.ok) {
         await loadData();
+        capture(events.budgetUpdated, {
+          budgetId: editingBudget.id,
+          category: editingBudget.category,
+          limitAmount: parseFloat(budgetForm.limitAmount),
+        });
         setShowEditModal(false);
         setEditingBudget(null);
       }
@@ -181,6 +226,9 @@ export default function BudgetPage() {
 
       if (response.ok) {
         await loadData();
+        capture(events.budgetDeleted, {
+          budgetId: id,
+        });
       }
     } catch (error) {
       console.error('Erro ao excluir orçamento:', error);
@@ -208,6 +256,12 @@ export default function BudgetPage() {
     if (percentage >= 100) return 'bg-red-500';
     if (percentage >= threshold) return 'bg-yellow-500';
     return 'bg-green-500';
+  };
+
+  const getProgressWidthClass = (percentage: number) => {
+    const safePercentage = Math.max(0, Math.min(100, percentage));
+    const classIndex = Math.round(safePercentage / 5);
+    return PROGRESS_WIDTH_CLASSES[classIndex] || 'w-0';
   };
 
   const totalBudget = budgetsWithSpending.reduce((sum, b) => sum + b.limitAmount, 0);
@@ -246,6 +300,7 @@ export default function BudgetPage() {
                 Mês
               </label>
               <select
+                title="Selecionar mês"
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
                 className="p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -260,6 +315,7 @@ export default function BudgetPage() {
                 Ano
               </label>
               <select
+                title="Selecionar ano"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
                 className="p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -392,8 +448,7 @@ export default function BudgetPage() {
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
                     <div
-                      className={`h-full transition-all duration-300 ${getProgressColor(percentage, budget.alertThreshold)}`}
-                      style={{ width: `${percentage}%` }}
+                      className={`h-full transition-all duration-300 ${getProgressColor(percentage, budget.alertThreshold)} ${getProgressWidthClass(percentage)}`}
                     />
                   </div>
                 </div>
@@ -461,6 +516,7 @@ export default function BudgetPage() {
                   Categoria
                 </label>
                 <select
+                  title="Categoria do orçamento"
                   value={budgetForm.category}
                   onChange={(e) => setBudgetForm(prev => ({ ...prev, category: e.target.value }))}
                   className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -476,6 +532,7 @@ export default function BudgetPage() {
                     Mês
                   </label>
                   <select
+                    title="Mês do orçamento"
                     value={budgetForm.month}
                     onChange={(e) => setBudgetForm(prev => ({ ...prev, month: parseInt(e.target.value) }))}
                     className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -490,6 +547,7 @@ export default function BudgetPage() {
                     Ano
                   </label>
                   <select
+                    title="Ano do orçamento"
                     value={budgetForm.year}
                     onChange={(e) => setBudgetForm(prev => ({ ...prev, year: parseInt(e.target.value) }))}
                     className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
@@ -505,6 +563,7 @@ export default function BudgetPage() {
                   Valor Limite (R$)
                 </label>
                 <input
+                  title="Valor limite do orçamento"
                   type="number"
                   step="0.01"
                   value={budgetForm.limitAmount}
@@ -518,6 +577,7 @@ export default function BudgetPage() {
                   Alerta em (%)
                 </label>
                 <input
+                  title="Percentual para alerta de orçamento"
                   type="number"
                   min="1"
                   max="100"
@@ -561,6 +621,7 @@ export default function BudgetPage() {
                   Nome do Orçamento
                 </label>
                 <input
+                  title="Nome do orçamento"
                   type="text"
                   value={budgetForm.name}
                   onChange={(e) => setBudgetForm(prev => ({ ...prev, name: e.target.value }))}
@@ -572,6 +633,7 @@ export default function BudgetPage() {
                   Valor Limite (R$)
                 </label>
                 <input
+                  title="Valor limite do orçamento"
                   type="number"
                   step="0.01"
                   value={budgetForm.limitAmount}
@@ -584,6 +646,7 @@ export default function BudgetPage() {
                   Alerta em (%)
                 </label>
                 <input
+                  title="Percentual para alerta de orçamento"
                   type="number"
                   min="1"
                   max="100"

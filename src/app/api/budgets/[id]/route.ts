@@ -1,77 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import prisma from '@/lib/db';
+import { requireAuthenticatedUser } from '@/server/auth/user-session';
+import { budgetRepository } from '@/server/repositories/budget-repository';
+import { withApiHandler } from '@/server/http/route';
+import { analyticsService } from '@/services/analytics/analyticsService';
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return withApiHandler(async () => {
     const { id } = await params;
-    const session = await auth();
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
+    const user = await requireAuthenticatedUser();
 
     const body = await request.json();
     const { name, limitAmount, alertThreshold } = body;
 
-    const budget = await prisma.budget.update({
-      where: {
-        id,
-        userId: user.id
-      },
-      data: {
-        ...(name && { name }),
-        ...(limitAmount && { limitAmount: parseFloat(limitAmount) }),
-        ...(alertThreshold && { alertThreshold: parseFloat(alertThreshold) })
-      }
+    const budget = await budgetRepository.updateOwned(id, user.id, {
+      ...(name ? { name } : {}),
+      ...(limitAmount ? { limitAmount: parseFloat(limitAmount) } : {}),
+      ...(alertThreshold ? { alertThreshold: parseFloat(alertThreshold) } : {}),
     });
 
-    return NextResponse.json({ budget });
-  } catch (error) {
-    console.error('Error updating budget:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+    await analyticsService.captureServerEvent({
+      event: 'budget_updated',
+      distinctId: user.id,
+      properties: {
+        budgetId: id,
+        hasNameChange: Boolean(name),
+        hasLimitChange: Boolean(limitAmount),
+        hasAlertThresholdChange: Boolean(alertThreshold),
+      },
+    });
+
+    return { budget };
+  });
 }
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
+  return withApiHandler(async () => {
     const { id } = await params;
-    const session = await auth();
-    if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const user = await requireAuthenticatedUser();
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email }
+    await budgetRepository.deleteOwned(id, user.id);
+
+    await analyticsService.captureServerEvent({
+      event: 'budget_deleted',
+      distinctId: user.id,
+      properties: {
+        budgetId: id,
+      },
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
-
-    await prisma.budget.delete({
-      where: {
-        id,
-        userId: user.id
-      }
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Error deleting budget:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+    return { success: true };
+  });
 }
